@@ -57,6 +57,7 @@ function this.init()
 end
 
 function this.update(dt, mouse)
+    -- Clignotement du démarrage
     if this.buttonStartBlinkTimer >= this.constantes.buttonStartBlinkTimerLength then
         this.buttonStartBlinkDelta = -1 
     else
@@ -71,7 +72,6 @@ function this.update(dt, mouse)
         -- Mais il ne peut pas bouger
         this.tanks[this.currentTank].x = love.graphics.getWidth() / 2
         this.tanks[this.currentTank].angle = 0
-
         modules.tank.updateTank(dt, this.tanks[this.currentTank])
         modules.turret.updateTurret(dt, this.turrets[this.currentTank], mouse)
     elseif this.selectionWip == this.constantes.selection.modes.tank then
@@ -103,7 +103,6 @@ function this.update(dt, mouse)
         if this.selectionTtl >= this.constantes.selection.ttl then
             this.selectionWip = this.constantes.selection.modes.none
             this.selectionTtl = 0
-
             love.event.quit()
         end
     end
@@ -164,7 +163,6 @@ function this.mousepressed(x, y, button, istouch, presses)
 end
 
 function this.keypressed(key, scancode, isrepeat)
-    print("key", key)
     if this.selectionWip == this.constantes.selection.modes.none then
         if key == "left" or key == "right" then
             this.selectionWip = this.constantes.selection.modes.tank

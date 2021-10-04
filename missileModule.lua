@@ -2,69 +2,6 @@ local this = {}
 
 this.constantes = {}
 
--- tir de base 
-this.constantes.base = {}
-this.constantes.base.mode = 1
-this.constantes.base.scope = 350
-this.constantes.base.reload = 0.5
-this.constantes.base.explosionZoom = 1
-this.constantes.base.ttl = 1
-this.constantes.base.easing = modules.tweening.easingOutCirc
-
--- Tir groupé
-this.constantes.gun = {}
-this.constantes.gun.mode = 2
-this.constantes.gun.scope = 350
-this.constantes.gun.minScope = 250
-this.constantes.gun.maxScope = 325
-this.constantes.gun.reload = 0.5
-this.constantes.gun.explosionZoom = 1
-this.constantes.gun.ttl = 1
-this.constantes.gun.angleAmplitude = math.pi / 24
-this.constantes.gun.nbChild = 5
-this.constantes.gun.delay = 0.2
-this.constantes.gun.easing = modules.tweening.easingOutCirc
-this.constantes.gun.childMode = this.constantes.base.mode
-this.constantes.gun.fire = {}
-this.constantes.gun.fire.speed = 20
-this.constantes.gun.fire.zoom = 1.3
-
--- Tir en rafale
-this.constantes.rafale = {}
-this.constantes.rafale.mode = 3
-this.constantes.rafale.minScope = 50
-this.constantes.rafale.maxScope = 350
-this.constantes.rafale.intervalScope = 25
-this.constantes.rafale.reload = 1
-this.constantes.rafale.minExplosionZoom = 0.75
-this.constantes.rafale.maxExplosionZoom = 1.5
-this.constantes.rafale.minTtl = 0.5
-this.constantes.rafale.maxTtl = 1.5
-this.constantes.rafale.nbStep = (this.constantes.rafale.maxScope - this.constantes.rafale.minScope) / this.constantes.rafale.intervalScope
-this.constantes.rafale.easing = modules.tweening.easingOutCirc
-this.constantes.rafale.delay = 0.2
-this.constantes.rafale.childMode = this.constantes.base.mode
-this.constantes.rafale.fire = {}
-this.constantes.rafale.fire.speed = 20
-this.constantes.rafale.fire.frame = 5
-this.constantes.rafale.fire.zoom = 1.8
-
--- Tir explosif
-this.constantes.rebound = {}
-this.constantes.rebound.mode = 4
-this.constantes.rebound.scope = 450
-this.constantes.rebound.number = 8
-this.constantes.rebound.reload = 1.5
-this.constantes.rebound.minScope = 10
-this.constantes.rebound.maxScope = 100
-this.constantes.rebound.explosionZoom = 2
-this.constantes.rebound.ttl = 2
-this.constantes.rebound.easing = modules.tweening.easingInExpo
-this.constantes.rebound.fire = {}
-this.constantes.rebound.fire.speed = 25
-this.constantes.rebound.fire.zoom = 1.8
-this.constantes.rebound.childMode = this.constantes.base.mode
-
 -- Explosion
 this.constantes.explosion = {}
 this.constantes.explosion.speed = 12
@@ -110,21 +47,17 @@ function this.load()
         this.images.fires[i] = love.graphics.newImage("images/shot_" .. i .. ".png")
     end
     this.sounds.shots[1] = love.audio.newSource("sounds/shot.wav", "static")
+
+    -- Chargement des modules 
+    table.insert(this.missilesModules, require("missiles/baseMissileModule"))
+    table.insert(this.missilesModules, require("missiles/gunMissileModule"))
+    table.insert(this.missilesModules, require("missiles/rafaleMissileModule"))
+    table.insert(this.missilesModules, require("missiles/reboundMissileModule"))
 end
 
 -- Factory à missiles
 function this.create(myTank, myMissileMode)
-    local myMissile = this.createNewMissile(myMissileMode, myTank)
-    if myMissileMode == this.constantes.base.mode then
-        this.initBase(myMissile)
-    elseif myMissileMode == this.constantes.gun.mode then
-        this.initGun(myMissile)
-    elseif myMissileMode == this.constantes.rafale.mode then
-        this.initRafale(myMissile)
-    elseif myMissileMode == this.constantes.rebound.mode then
-        this.initRebound(myMissile)
-    end
-    return (myMissile)
+    return (this.missilesModules[myMissileMode].create(myTank))
 end
 
 -- Création d'un missile
@@ -148,186 +81,6 @@ function this.createNewMissile(myMissileMode, myTank)
     myMissile.fireImage = nil
     myMissile.fireImages = {}
     return myMissile
-end
-
-function this.initBase(myMissile)
-    -- Initialisations spécifiques au type demandé
-    myMissile.explosionZoom = this.constantes.base.explosionZoom
-    myMissile.initialTtl = this.constantes.base.ttl
-    myMissile.ttl = myMissile.initialTtl
-    myMissile.scope = this.constantes.base.scope
-    myMissile.easing = this.constantes.base.easing
-    myMissile.image = this.images.missiles[1]
-    myMissile.center = {}
-    myMissile.center.x = myMissile.image:getWidth() / 2
-    myMissile.center.y = myMissile.image:getHeight() / 2
-    myMissile.hitBox.radius = myMissile.image:getWidth() / 2
-    myMissile.fireSoundStarted = true
-    myMissile.octave = 2
-    myMissile.reload = this.constantes.base.reload
-    myMissile.fireIndex = 0
-    myMissile.fireImage = nil
-    myMissile.fireImages = {}
-end
-
--- Initialisations spécifiques au type de missile
-function this.initGun(myMissile)
-    -- Initialisations spécifiques au type demandé
-    myMissile.hitBox.type = modules.hitbox.constantes.noneType
-    myMissile.step = 0    
-    myMissile.initialTtl = this.constantes.gun.ttl
-    myMissile.ttl = myMissile.initialTtl
-    myMissile.easing = this.constantes.gun.easing
-    myMissile.scope = this.constantes.gun.maxScope
-    myMissile.center = {}
-    myMissile.center.x = 0
-    myMissile.center.y = 0
-    myMissile.isFired = true
-    myMissile.fireTtl = 0
-    myMissile.fireIndex = 0
-    myMissile.fireImage = nil
-    myMissile.fireImages = {}
-    myMissile.fireImages[1] = modules.missile.images.fires[1]
-    myMissile.fireImages[2] = modules.missile.images.fires[2]
-    myMissile.fireImages[3] = myMissile.fireImages[1]
-    myMissile.fireImages[4] = myMissile.fireImages[2]
-    myMissile.fireImages[5] = myMissile.fireImages[1]
-    myMissile.fireImages[6] = myMissile.fireImages[2]
-    myMissile.fireImages[7] = myMissile.fireImages[1]
-    myMissile.fireSpeed = this.constantes.gun.fire.speed
-    myMissile.fireZoom = this.constantes.gun.fire.zoom 
-    myMissile.fireSoundStarted = false
-    myMissile.octave = 2
-    myMissile.reload = this.constantes.gun.reload
-    table.insert(modules.missile.missiles, myMissile)
-    local newMissile
-    for i = 1, this.constantes.gun.nbChild do
-        newMissile = this.createGunChildMissile(myMissile)
-    end
-    newMissile.angle = myMissile.angle
-    newMissile.scope = this.constantes.gun.scope
-end
-
--- Initialisations spécifiques au type de missile
-function this.initRafale(myMissile)
-    myMissile.hitBox.type = modules.hitbox.constantes.noneType
-    myMissile.step = 0    
-    myMissile.initialTtl = this.constantes.rafale.maxTtl
-    myMissile.ttl = myMissile.initialTtl
-    myMissile.easing = this.constantes.rafale.easing
-    myMissile.scope = this.constantes.rafale.maxScope
-    myMissile.center = {}
-    myMissile.center.x = 0
-    myMissile.center.y = 0
-    myMissile.isFired = true
-    myMissile.fireTtl = 0
-    myMissile.octave = 1
-    myMissile.reload = this.constantes.rafale.reload
-    myMissile.fireIndex = 0
-    myMissile.fireImage = nil
-    myMissile.fireImages = {}
-    myMissile.fireImages[1] = modules.missile.images.fires[1]
-    myMissile.fireImages[2] = modules.missile.images.fires[3]
-    myMissile.fireImages[3] = myMissile.fireImages[1]
-    myMissile.fireImages[4] = myMissile.fireImages[2]
-    myMissile.fireImages[5] = myMissile.fireImages[1]
-    myMissile.fireSpeed = this.constantes.rafale.fire.speed
-    myMissile.fireZoom = this.constantes.rafale.fire.zoom 
-
-    for i = 1, this.constantes.rafale.nbStep do
-        this.createRafaleChildMissile(myMissile, i)
-    end
-    table.insert(modules.missile.missiles, myMissile)
-end
-
--- Génération d'un missile explosif
-function this.initRebound(myMissile)
-    -- Initialisation spécifiques au type demandé
-    myMissile.explosionZoom = this.constantes.rebound.explosionZoom
-    myMissile.initialTtl = this.constantes.rebound.ttl
-    myMissile.ttl = myMissile.initialTtl
-    myMissile.scope = this.constantes.rebound.scope
-    myMissile.easing = this.constantes.rebound.easing
-    myMissile.image = this.images.missiles[3]
-    myMissile.center = {}
-    myMissile.center.x = myMissile.image:getWidth() / 2
-    myMissile.center.y = myMissile.image:getHeight() / 2
-    myMissile.hitBox.radius = myMissile.image:getWidth() / 2
-    myMissile.isFired = true
-    myMissile.fireTtl = 0
-    myMissile.fireSoundStarted = false
-    myMissile.octave = 0.5
-    myMissile.reload = this.constantes.rebound.reload
-    myMissile.fireImages = {}
-    myMissile.fireImages[1] = modules.missile.images.fires[1]
-    myMissile.fireImages[2] = modules.missile.images.fires[2]
-    myMissile.fireImages[3] = modules.missile.images.fires[3]
-    myMissile.fireImages[4] = modules.missile.images.fires[4]
-    myMissile.fireImages[5] = myMissile.fireImages[4]
-    myMissile.fireImages[6] = myMissile.fireImages[3]
-    myMissile.fireImages[7] = myMissile.fireImages[2]
-    myMissile.fireImages[8] = myMissile.fireImages[1]
-    myMissile.fireSpeed = this.constantes.rebound.fire.speed
-    myMissile.fireZoom = this.constantes.rebound.fire.zoom 
-    table.insert(modules.missile.missiles, myMissile)
-end
-
--- Génération de missile de replique du missile explosif
-function this.createReboundChildMissile(myMissile, index)
-    local newMissile = modules.missile.create(myMissile.tank, this.constantes.rebound.childMode)
-
-    newMissile.scope = love.math.random(this.constantes.rebound.minScope, this.constantes.rebound.maxScope)
-    newMissile.initialTtl = newMissile.scope / this.constantes.rebound.maxScope * newMissile.initialTtl
-    newMissile.ttl = newMissile.initialTtl
-    newMissile.angle = 2 * math.pi / this.constantes.rebound.number * index
-    newMissile.initialx = myMissile.x
-    newMissile.initialy = myMissile.y
-    newMissile.hitBox.x = newMissile.initialxx
-    newMissile.hitBox.y = newMissile.initialy
-
-    table.insert(modules.missile.missiles, newMissile)
-end
-
-function this.createGunChildMissile(myMissile)
-    -- Création et initialisation du nouveau missile
-    local newMissile = modules.missile.create(myMissile.tank, this.constantes.gun.childMode)
-
-    -- Gestion du scope des obus de la rafale
-    newMissile.scope = math.prandom(this.constantes.gun.minScope, this.constantes.gun.maxScope)
-
-    -- Gestion du angle des obus de la rafale
-    newMissile.angle = math.prandom(myMissile.angle - this.constantes.gun.angleAmplitude, myMissile.angle + this.constantes.gun.angleAmplitude)
-
-    -- Gestion du ttl des obus de la rafale
-    newMissile.initialTtl = newMissile.scope / this.constantes.gun.scope * this.constantes.gun.ttl
-    newMissile.ttl = newMissile.initialTtl
-
-    -- Ajout à la collection de missiles
-    table.insert(modules.missile.missiles, newMissile)
-    this.updateFireSound(myMissile)
-    return newMissile
-end
-
-function this.createRafaleChildMissile(myMissile, index)
-    -- Création et initialisation du nouveau missile
-    local newMissile = modules.missile.create(myMissile.tank, this.constantes.rafale.childMode)
-
-    -- Gestion du zoom des obus de la rafale
-    newMissile.explosionZoom = (this.constantes.rafale.maxExplosionZoom - this.constantes.rafale.minExplosionZoom) * index / this.constantes.rafale.nbStep + this.constantes.rafale.minExplosionZoom
-
-    -- Gestion du scope des obus de la rafale (chaque obus à une portée plus longue)
-    newMissile.scope = (this.constantes.rafale.maxScope - this.constantes.rafale.minScope) * index / this.constantes.rafale.nbStep + this.constantes.rafale.minScope
-
-    -- Gestion du ttl des obus de la rafale (chaque obus à un ttl plus long)
-    newMissile.initialTtl = (this.constantes.rafale.maxTtl - this.constantes.rafale.minTtl) * index / this.constantes.rafale.nbStep + this.constantes.rafale.minTtl
-    newMissile.ttl = newMissile.initialTtl
-    newMissile.octave = myMissile.octave
-
-    if index % 2 == 0 then
-        this.updateFireSound(newMissile)
-    end
-    -- Ajout à la collection de missiles
-    table.insert(modules.missile.missiles, newMissile)
 end
 
 function this.updateFireSound(myMissile)
@@ -372,14 +125,10 @@ function this.updateMissile(dt, myMissile)
     else
         this.updateFire(dt, myMissile)
         this.updateMovingMissile(dt, myMissile)
-
-        if myMissile.mode == this.constantes.base.mode then
-        elseif myMissile.mode == this.constantes.gun.mode then
-        elseif myMissile.mode == this.constantes.rafale.mode then
-        elseif myMissile.mode == this.constantes.rebound.mode then
-            this.updateRebound(dt, myMissile)
-        end
     end
+
+    -- Update spécifique au type de missile
+    myMissile.module.update(dt, myMissile)
 end
 
 function this.updateMovingMissile(dt, myMissile)
@@ -426,17 +175,6 @@ function this.updateFire(dt, myMissile)
             myMissile.isFired = false
         else
             myMissile.fireImage = myMissile.fireImages[myMissile.fireIndex]
-        end
-    end
-end
-
-function this.updateRebound(dt, myMissile)
-    if myMissile.exploded == true then
-        -- Le missile géant explose en plusieurs missiles standards après l'explosion classique
-        for i = 1, this.constantes.rebound.number do
-            
-            -- Génération des missiles enfants
-            this.createReboundChildMissile(myMissile, i)
         end
     end
 end
@@ -497,7 +235,7 @@ end
 
 function this.drawActiveMissile(myMissile)
     -- Affichage du missile proprement dit
-    if myMissile.image ~= nil then
+    if myMissile.hitBox.type ~= modules.hitbox.constantes.noneType then
         love.graphics.draw(
             myMissile.image, 
             myMissile.x + modules.battleground.offset.x, 
@@ -533,6 +271,9 @@ function this.drawMissile(myMissile)
             this.drawActiveMissile(myMissile)
         end
     end
+        
+    -- draw spécifique au type de missile
+    myMissile.module.draw(myMissile)
 end
 
 return this
