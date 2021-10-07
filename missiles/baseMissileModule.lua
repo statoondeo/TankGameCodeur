@@ -9,6 +9,9 @@ this.constantes.reload = 0.5
 this.constantes.explosionZoom = 1
 this.constantes.ttl = 1
 this.constantes.easing = modules.tweening.easingOutCirc
+this.constantes.damage = {}
+this.constantes.damage.missile = 100 
+this.constantes.damage.explosion = 50
 
 -- Factory à missiles
 function this.create(myTank)
@@ -36,6 +39,10 @@ function this.init(myMissile)
     myMissile.fireIndex = 0
     myMissile.fireImage = nil
     myMissile.fireImages = {}
+    myMissile.damage = {}
+    myMissile.damage.missile = this.constantes.damage.missile
+    myMissile.damage.explosion = this.constantes.damage.explosion
+    myMissile.explosionHitbox.radius = this.constantes.explosionZoom * modules.missile.images.missiles[1]:getWidth()
 end
 
 function this.update(dt, myMissile)

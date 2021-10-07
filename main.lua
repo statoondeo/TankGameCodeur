@@ -17,28 +17,24 @@ end
 modules = {}
 
 function loadModules()
-    modules.tweening = require("tweeningModule")
+    modules.tweening = require("modules/tweeningModule")
     
-    modules.mainMenu = require("mainTitleModule")
-    modules.mainMenu.load()
-    
-    -- Chargement du module terrain
-    modules.battleground = require("battlegroundModule")
-    modules.battleground.load()
+    modules.game = require("modules/gameModule")
+    modules.game.load()
 
-    modules.tank = require("tankModule")
+    modules.tank = require("tanks/tankModule")
     modules.tank.load()
     
-    modules.obstacle = require("obstacleModule")
+    modules.obstacle = require("modules/obstacleModule")
     modules.obstacle.load()
     
-    modules.hitbox = require("hitboxModule")
+    modules.hitbox = require("modules/hitboxModule")
     modules.hitbox.load()
 
-    modules.missile = require("missileModule")
+    modules.missile = require("missiles/missileModule")
     modules.missile.load()
 
-    modules.turret = require("turretModule")
+    modules.turret = require("turrets/turretModule")
     modules.turret.load()
 end
 
@@ -49,24 +45,24 @@ function love.load()
     -- Chargement des modules
     loadModules()
 
-    -- Chargement du menu principal
-    modules.battleground.init(modules.mainMenu)
+    -- Chargement du menu principal    
+    local mainMenu = require("maps/mainTitleModule")
+    mainMenu.load()    
+    modules.game.init(mainMenu)
 end
 
 function love.update(dt)
-    modules.battleground.update(dt)        
+    modules.game.update(dt)        
 end
 
 function love.draw()
-    modules.battleground.draw()
+    modules.game.draw()
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-    if button == 1 then
-        modules.battleground.mousepressed(x, y, button, istouch, presses)   
-    end
+    modules.game.mousepressed(x, y, button, istouch, presses)   
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    modules.battleground.keypressed(key, scancode, isrepeat)  
+    modules.game.keypressed(key, scancode, isrepeat)  
 end

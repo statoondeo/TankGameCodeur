@@ -4,20 +4,23 @@ this.constantes = {}
 
 -- Tir groupé
 this.constantes.mode = 2
-this.constantes.scope = 350
-this.constantes.minScope = 250
-this.constantes.maxScope = 325
+this.constantes.scope = 250
+this.constantes.minScope = 150
+this.constantes.maxScope = 200
 this.constantes.reload = 0.5
-this.constantes.explosionZoom = 1
+this.constantes.explosionZoom = 1.1
 this.constantes.ttl = 1
 this.constantes.angleAmplitude = math.pi / 24
-this.constantes.nbChild = 4
+this.constantes.nbChild = 2
 this.constantes.delay = 0.2
 this.constantes.easing = modules.tweening.easingOutCirc
 this.constantes.childMode = 1
 this.constantes.fire = {}
 this.constantes.fire.speed = 20
 this.constantes.fire.zoom = 1.3
+this.constantes.damage = {}
+this.constantes.damage.missile = 110
+this.constantes.damage.explosion = 55
 
 -- Factory à missiles
 function this.create(myTank)
@@ -30,10 +33,11 @@ end
 function this.init(myMissile)
     -- Initialisations spécifiques au type demandé
     myMissile.module = this
-    myMissile.hitBox.type = modules.hitbox.constantes.noneType
     myMissile.step = 0    
     myMissile.initialTtl = this.constantes.ttl
     myMissile.ttl = myMissile.initialTtl
+    myMissile.explosionZoom = this.constantes.explosionZoom
+    myMissile.image = modules.missile.images.missiles[1]
     myMissile.easing = this.constantes.easing
     myMissile.scope = this.constantes.maxScope
     myMissile.center = {}
@@ -57,10 +61,11 @@ function this.init(myMissile)
     myMissile.fireSoundStarted = false
     myMissile.octave = 2
     myMissile.reload = this.constantes.reload
+    myMissile.damage = {}
+    myMissile.damage.missile = this.constantes.damage.missile
+    myMissile.damage.explosion = this.constantes.damage.explosion
+    myMissile.explosionHitbox.radius = this.constantes.explosionZoom * modules.missile.images.missiles[1]:getWidth()
     table.insert(modules.missile.missiles, myMissile)
-    local newMissile = this.createChild(myMissile)
-    newMissile.angle = myMissile.angle
-    newMissile.scope = this.constantes.scope
 end
 
 function this.createChild(myMissile)

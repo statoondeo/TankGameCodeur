@@ -5,10 +5,10 @@ this.constantes = {}
 -- Tir explosif
 this.constantes.mode = 4
 this.constantes.scope = 450
-this.constantes.number = 8
+this.constantes.number = 16
 this.constantes.reload = 1.5
-this.constantes.minScope = 10
-this.constantes.maxScope = 100
+this.constantes.minScope = 50
+this.constantes.maxScope = 150
 this.constantes.explosionZoom = 2
 this.constantes.ttl = 2
 this.constantes.easing = modules.tweening.easingInExpo
@@ -16,6 +16,9 @@ this.constantes.fire = {}
 this.constantes.fire.speed = 25
 this.constantes.fire.zoom = 1.8
 this.constantes.childMode = 1
+this.constantes.damage = {}
+this.constantes.damage.missile = 200
+this.constantes.damage.explosion = 100
 
 -- Factory à missiles
 function this.create(myTank)
@@ -39,6 +42,7 @@ function this.init(myMissile)
     myMissile.center.y = myMissile.image:getHeight() / 2
     myMissile.hitBox.radius = myMissile.image:getWidth() / 2
     myMissile.isFired = true
+    myMissile.tank.isFired = true
     myMissile.fireTtl = 0
     myMissile.fireSoundStarted = false
     myMissile.octave = 0.5
@@ -55,6 +59,10 @@ function this.init(myMissile)
     myMissile.fireSpeed = this.constantes.fire.speed
     myMissile.fireZoom = this.constantes.fire.zoom 
     myMissile.rocketImage = modules.missile.images.fires[1]
+    myMissile.damage = {}
+    myMissile.damage.missile = this.constantes.damage.missile
+    myMissile.damage.explosion = this.constantes.damage.explosion
+    myMissile.explosionHitbox.radius = this.constantes.explosionZoom * modules.missile.images.missiles[1]:getWidth()
     table.insert(modules.missile.missiles, myMissile)
 end
 
@@ -68,7 +76,7 @@ function this.createChild(myMissile, index)
     newMissile.angle = 2 * math.pi / this.constantes.number * index
     newMissile.initialx = myMissile.x
     newMissile.initialy = myMissile.y
-    newMissile.hitBox.x = newMissile.initialxx
+    newMissile.hitBox.x = newMissile.initialx
     newMissile.hitBox.y = newMissile.initialy
 
     table.insert(modules.missile.missiles, newMissile)
@@ -88,8 +96,8 @@ end
 function this.draw(myMissile)
     love.graphics.draw(
         myMissile.rocketImage, 
-        myMissile.x + modules.battleground.offset.x, 
-        myMissile.y + modules.battleground.offset.y, 
+        myMissile.x + modules.game.offset.x, 
+        myMissile.y + modules.game.offset.y, 
         myMissile.angle, 
         -1, 
         1, 
