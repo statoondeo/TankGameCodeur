@@ -18,6 +18,7 @@ this.constantes.modes.ttl = 0.5
 this.constantes.modes.messageTtl = 2
 this.images = {}
 this.sounds = {}
+this.musics = {}
 this.fonts = {}
 this.fonts.size = {}
 this.fonts.size.tiny = 9
@@ -72,7 +73,12 @@ function this.load()
     this.fonts.large = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.large)
     this.fonts.giant = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.giant)
     this.sounds.validation = love.audio.newSource("sounds/confirmation_001.ogg", "static")
-
+    this.sounds.switch = love.audio.newSource("sounds/switch28.ogg", "static")
+    this.musics.menu = love.audio.newSource("musics/bensound-epic.mp3", "stream")
+    this.musics.map1 = love.audio.newSource("musics/bensound-evolution.mp3", "stream")
+    this.musics.map2 = love.audio.newSource("musics/bensound-theduel.mp3", "stream")
+    this.musics.win = love.audio.newSource("musics/bensound-brazilsamba.mp3", "stream")
+    this.musics.loose = love.audio.newSource("musics/bensound-creepy.mp3", "stream")
 end
 
 function this.init(myMap)
@@ -214,6 +220,7 @@ end
 function this.update(dt)
     if this.mode == this.constantes.modes.init then
         this.initialTtl = this.initialTtl + dt
+        this.map.music:setVolume(this.initialTtl / this.constantes.modes.ttl)
         if this.initialTtl > this.constantes.modes.ttl then
             this.initialTtl = 0
             this.mode = this.constantes.modes.game
@@ -223,12 +230,20 @@ function this.update(dt)
         end
     elseif this.mode == this.constantes.modes.quit then
         this.initialTtl = this.initialTtl + dt
+        this.map.music:setVolume((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl)
+        if this.musics.win:isPlaying() then
+            this.musics.win:setVolume((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl)
+        end
+        if this.musics.loose:isPlaying() then
+            this.musics.loose:setVolume((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl)
+        end
         if this.initialTtl > this.constantes.modes.ttl then
             this.initialTtl = 0
             this.actionToDo(this.actionToDoParam1, this.actionToDoParam2)
         end
     elseif this.mode == this.constantes.modes.initpause then
         this.initialTtl = this.initialTtl + dt
+        this.map.music:setVolume(this.initialTtl / this.constantes.modes.ttl)
         if this.initialTtl > this.constantes.modes.ttl then
             this.initialTtl = 0
             this.pauseState = true
@@ -236,6 +251,7 @@ function this.update(dt)
         end
     elseif this.mode == this.constantes.modes.quitpause then
         this.initialTtl = this.initialTtl + dt
+        this.map.music:setVolume((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl)
         if this.initialTtl > this.constantes.modes.ttl then
             this.initialTtl = 0
             this.pauseState = false
@@ -261,10 +277,26 @@ function this.update(dt)
         end
     elseif this.mode == this.constantes.modes.initGameEnd then
         this.initialTtl = this.initialTtl + dt
+        this.map.music:setVolume((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl)
+
+        if this.map.playerWin == true then
+            if not this.musics.win:isPlaying() then
+                this.musics.win:play()
+            end
+            this.musics.win:setVolume(this.initialTtl / this.constantes.modes.ttl)
+        
+        elseif this.map.playerLoose == true then
+            if not this.musics.loose:isPlaying() then
+                this.musics.loose:play()
+            end
+            this.musics.loose:setVolume(this.initialTtl / this.constantes.modes.ttl)
+
+        end
         if this.initialTtl > this.constantes.modes.ttl then
             this.initialTtl = 0
             this.mode = this.constantes.modes.gameEnd
             modules.game.sounds.validation:play()
+            this.map.music:stop()
         end
     elseif this.mode == this.constantes.modes.gameEnd then
         -- On attend une réaction du joueur
@@ -516,7 +548,6 @@ function this.displayGameMessage(label)
 end
 
 function this.changeScreen(whatToDo, parameter1, parameter2)
-    this.sounds.validation:play()
     this.mode = this.constantes.modes.quit
     this.initialTtl = 0
     this.actionToDo = whatToDo
@@ -535,6 +566,15 @@ end
 
 function this.loadmap(map, playerSkin)
     map.playerSkin = playerSkin
+    if this.map.music:isPlaying() then
+        this.map.music:stop()
+    end            
+    if this.musics.win:isPlaying() then
+        this.musics.win:stop()
+    end
+    if this.musics.loose:isPlaying() then
+        this.musics.loose:stop()
+    end
     this.init(map)
 end
 

@@ -9,6 +9,7 @@ this.constantes.tiles.size.y = 64
 this.constantes.tiles.number = {}
 this.constantes.tiles.number.x = 24
 this.constantes.tiles.number.y = 12
+this.music = modules.game.musics.map2
 
 this.tiles = 
 {
@@ -146,6 +147,8 @@ function this.init()
         goalHitbox.bonus = this.goals[i][4]
         table.insert(this.goalHitbox, goalHitbox)
     end
+    this.music:setLooping(true)
+    this.music:play()
 end
 
 function this.endInit()
@@ -161,6 +164,7 @@ function this.CheckPlayerWin()
             if myGoal.achieved == false and modules.hitbox.IsCollision(modules.game.playerTank.hitBox, myGoal) == true then
                 myGoal.achieved = true
                 this.goalAchieved = this.goalAchieved + 1
+                modules.game.sounds.validation:play()
             end
             allGoalAchieved = allGoalAchieved and myGoal.achieved
         end

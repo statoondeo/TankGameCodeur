@@ -9,6 +9,7 @@ this.constantes.tiles.size.y = 64
 this.constantes.tiles.number = {}
 this.constantes.tiles.number.x = 16
 this.constantes.tiles.number.y = 12
+this.music = modules.game.musics.map1
 
 this.tiles = 
 {
@@ -113,6 +114,8 @@ function this.init()
     this.goalHitbox.radius = this.goals[1][3]
     this.goalHitbox.angle = 0
     this.goals[1][4] = false
+    this.music:setLooping(true)
+    this.music:play()
 end
 
 function this.endInit()
@@ -127,6 +130,7 @@ function this.CheckPlayerWin()
             this.goals[1][4] = true
             this.missionStep = 2
             modules.game.displayGameMessage({"Mission update", "Seek and destroy all enemy Tanks", "Stay alive"})
+            modules.game.sounds.validation:play()
         end
     elseif this.missionStep == 2 then
         win = true

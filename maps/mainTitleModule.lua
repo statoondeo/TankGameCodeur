@@ -21,18 +21,20 @@ function this.load()
     this.offset.x = 0
     this.offset.y = 0
 
-    this.constantes.buttonStartBlinkTimerLength = 0.5
-    this.constantes.selection = {}
-    this.constantes.selection.ttl = 0.5
-    this.constantes.selection.modes = {}
-    this.constantes.selection.modes.none = 0
-    this.constantes.selection.modes.tank = 1
-    this.constantes.selection.modes.game = 2
-    this.constantes.selection.modes.quit = 3
-    this.constantes.difficulties = {}
-    this.constantes.difficulties[1] = "(Hard difficulty)"
-    this.constantes.difficulties[2] = "(Normal difficulty)"
-    this.constantes.difficulties[3] = "(Easy difficulty)"
+    this.innerConstantes = {}
+    this.innerConstantes.buttonStartBlinkTimerLength = 0.5
+    this.innerConstantes.selection = {}
+    this.innerConstantes.selection.ttl = 0.5
+    this.innerConstantes.selection.modes = {}
+    this.innerConstantes.selection.modes.none = 0
+    this.innerConstantes.selection.modes.tank = 1
+    this.innerConstantes.selection.modes.game = 2
+    this.innerConstantes.selection.modes.quit = 3
+    this.innerConstantes.difficulties = {}
+    this.innerConstantes.difficulties[1] = "(Hard difficulty)"
+    this.innerConstantes.difficulties[2] = "(Normal difficulty)"
+    this.innerConstantes.difficulties[3] = "(Easy difficulty)"
+    this.music = modules.game.musics.menu
 end
 
 function this.init()
@@ -43,20 +45,22 @@ function this.init()
     for i = 1, modules.tank.constantes.skins.number.player do
         local myTank = modules.tank.create(modules.tank.constantes.modes.player, i + 1, -100, 5 * love.graphics.getHeight() / 7, 0)
         myTank.drawLife = false
-        myTank.label = this.constantes.difficulties[i]
+        myTank.label = this.innerConstantes.difficulties[i]
         table.insert(this.tanks, myTank)
         table.insert(this.turrets, myTank.turret)
     end
     this.oldTank = 2
     this.currentTank = 2
-    this.selectionWip = this.constantes.selection.modes.tank
+    this.selectionWip = this.innerConstantes.selection.modes.tank
     this.selectionDirection = 1
     this.selectionTtl = 0
+    this.music:setLooping(true)
+    this.music:play()
 end
 
 function this.update(dt, mouse)
     -- Clignotement du démarrage
-    if this.buttonStartBlinkTimer >= this.constantes.buttonStartBlinkTimerLength then
+    if this.buttonStartBlinkTimer >= this.innerConstantes.buttonStartBlinkTimerLength then
         this.buttonStartBlinkDelta = -1 
     else
         if this.buttonStartBlinkTimer <= 0 then
@@ -65,21 +69,21 @@ function this.update(dt, mouse)
     end
     this.buttonStartBlinkTimer = this.buttonStartBlinkTimer + this.buttonStartBlinkDelta * dt
 
-    if this.selectionWip == this.constantes.selection.modes.none then
+    if this.selectionWip == this.innerConstantes.selection.modes.none then
         -- On affiche le tank
         -- Mais il ne peut pas bouger
         this.tanks[this.currentTank].x = love.graphics.getWidth() / 2
         this.tanks[this.currentTank].angle = 0
         modules.tank.updateTank(dt, this.tanks[this.currentTank])
         modules.turret.updateTurret(dt, this.turrets[this.currentTank], mouse)
-    elseif this.selectionWip == this.constantes.selection.modes.tank then
+    elseif this.selectionWip == this.innerConstantes.selection.modes.tank then
         this.selectionTtl = this.selectionTtl + dt
-        if this.selectionTtl >= this.constantes.selection.ttl then
-            this.selectionWip = this.constantes.selection.modes.none
+        if this.selectionTtl >= this.innerConstantes.selection.ttl then
+            this.selectionWip = this.innerConstantes.selection.modes.none
             this.selectionTtl = 0
         else
             -- On déplace les tanks
-            local distance = (100 + love.graphics.getWidth() / 2) * modules.tweening.easingInOutBack(this.selectionTtl / this.constantes.selection.ttl)
+            local distance = (100 + love.graphics.getWidth() / 2) * modules.tweening.easingInOutBack(this.selectionTtl / this.innerConstantes.selection.ttl)
             this.tanks[this.oldTank].x = this.tanks[this.oldTank].initialx + distance * this.selectionDirection
             this.tanks[this.currentTank].x = this.tanks[this.currentTank].initialx + distance * this.selectionDirection
             modules.tank.UpdateTurretAnchor(dt, this.tanks[this.oldTank])
@@ -122,7 +126,7 @@ function this.draw()
     love.graphics.setFont(modules.game.fonts.medium)
     font = love.graphics.getFont()
     label = "\"Enter\" to start"
-    love.graphics.setColor(255, 255, 255, modules.tweening.easingInOutCubic(this.buttonStartBlinkTimer / this.constantes.buttonStartBlinkTimerLength))
+    love.graphics.setColor(255, 255, 255, modules.tweening.easingInOutCubic(this.buttonStartBlinkTimer / this.innerConstantes.buttonStartBlinkTimerLength))
     love.graphics.print(label, (love.graphics.getWidth() - font:getWidth(label)) / 2, 4 * (love.graphics.getHeight() - font:getHeight(label)) / 7)
     love.graphics.setColor(255, 255, 255)
 
@@ -150,7 +154,7 @@ function this.draw()
         )
     end
 
-    if this.selectionWip == this.constantes.selection.modes.none then
+    if this.selectionWip == this.innerConstantes.selection.modes.none then
         love.graphics.setFont(modules.game.fonts.small)
         font = love.graphics.getFont()
         label = this.tanks[this.currentTank].label
@@ -173,15 +177,15 @@ function this.draw()
 end
 
 function this.mousepressed(x, y, button, istouch, presses)  
-    if this.selectionWip == this.constantes.selection.modes.none then
+    if this.selectionWip == this.innerConstantes.selection.modes.none then
         modules.tank.fire(this.tanks[this.currentTank])
     end
 end
 
 function this.keypressed(key, scancode, isrepeat)
-    if this.selectionWip == this.constantes.selection.modes.none then
+    if this.selectionWip == this.innerConstantes.selection.modes.none then
         if key == "left" or key == "right" then
-            this.selectionWip = this.constantes.selection.modes.tank
+            this.selectionWip = this.innerConstantes.selection.modes.tank
             this.oldTank = this.currentTank
             this.tanks[this.oldTank].initialx = this.tanks[this.oldTank].x
             if key == "left" then
@@ -199,6 +203,7 @@ function this.keypressed(key, scancode, isrepeat)
                 this.tanks[this.currentTank].initialx = -100
                 this.selectionDirection = 1
             end
+            modules.game.sounds.switch:play()
         elseif key == "return" then
             modules.game.sounds.validation:play()
             modules.game.changeScreen(modules.game.loadmap, require("maps/map1Module"), this.tanks[this.currentTank].skin) 
