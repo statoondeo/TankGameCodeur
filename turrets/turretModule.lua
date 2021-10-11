@@ -8,12 +8,15 @@ this.constantes.offset.x = 8
 this.constantes.offset.y = 0
 this.constantes.skins = {}
 this.constantes.skins.count = 6
+this.constantes.emotes = {}
+this.constantes.emotes.count = 3
 this.constantes.flames = {}
 this.constantes.flames.count = 2
 this.constantes.flames.speed = 10
 this.images = {}
 this.images.turrets = {}
 this.images.flames = {}
+this.images.emotes = {}
 
 this.turrets = {}
 this.turretsmodules = {}
@@ -25,6 +28,9 @@ function this.load()
     end 
     for i = 1, this.constantes.flames.count do
         this.images.flames[i] = love.graphics.newImage("images/flame_" .. i .. ".png")
+    end  
+    for i = 1, this.constantes.emotes.count do
+        this.images.emotes[i] = love.graphics.newImage("images/emote_" .. i .. ".png")
     end  
 
     -- Chargement des modules

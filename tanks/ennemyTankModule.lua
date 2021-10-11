@@ -6,10 +6,10 @@ this.constantes.modes = {}
 this.constantes.modes.player = 1
 this.constantes.modes.ennemy = 2
 
-this.constantes.acceleration = 2
+this.constantes.acceleration = 3
 this.constantes.angleAcceleration = 2
-this.constantes.angleTolerance = math.pi / 10
-this.constantes.defaultAcceleration = 0.5
+this.constantes.angleTolerance = math.pi / 36
+this.constantes.defaultAcceleration = 0.5  
 this.constantes.maxSpeed = 1
 this.constantes.maxSpeedEnnemy = 1
 this.constantes.tailLife = 1
@@ -38,12 +38,16 @@ function this.create(myTankMode, myTankSkin, x, y, angle)
     myTank.initialLife = this.constantes.initialLife
     myTank.life = myTank.initialLife
     myTank.state = this.constantes.states.goAhead
+    myTank.previousState = myTank.state
     myTank.checkTtl = this.constantes.states.checkTtl
-    this.moveAheadState(0, myTank)
     return myTank
 end
 
 function this.updateTank(dt, myTank)
+    if myTank.previousState ~= myTank.state then
+        print("State=", myTank.previousState, myTank.state)
+        myTank.previousState = myTank.state
+    end
     -- Est-ce que le tank rencontre une balise directionnelle?
     local myTankHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
     myTankHitbox.x = myTank.hitBox.x
@@ -102,10 +106,6 @@ function this.updateTank(dt, myTank)
             myTank.lastBeacon = 0
             myTank.checkTtl = this.constantes.states.checkTtl
         end
-    else
-        if myTank.state == this.constantes.states.moveStop then
-            myTank.state = this.constantes.states.goAhead
-        end
     end
 
     -- Comportement par état
@@ -139,23 +139,26 @@ end
 
 function this.moveStopState(dt, myTank)
     -- Si on n'accélère pas, le tank ralenti de lui-même
+    myTank.speed = myTank.speed - this.constantes.defaultAcceleration * dt
     if myTank.speed <= 0 then
-        myTank.speed = myTank.speed + this.constantes.defaultAcceleration * dt
-    else
-        myTank.speed = myTank.speed - this.constantes.defaultAcceleration * dt
+        myTank.speed = 0
     end
 end
 
 function this.rotate(dt, myTank, myAngle)
     myTank.speed = 0
-    if math.abs(myTank.angle - myAngle) <= this.constantes.angleTolerance then
+    local diffAngle = myAngle - myTank.angle
+    if math.abs(diffAngle) <= this.constantes.angleTolerance then
         myTank.angle = myAngle
         myTank.state = this.constantes.states.goAhead
     else
-        if myTank.angle > myAngle then
+        if diffAngle < 0 then
+            diffAngle = diffAngle + 2 * math.pi
+        end
+        if diffAngle > math.pi then
             myTank.angle = (myTank.angle - this.constantes.angleAcceleration * dt) % (2 * math.pi)
         else
-            myTank.angle = (myTank.angle - this.constantes.angleAcceleration * dt) % (2 * math.pi)
+            myTank.angle = (myTank.angle + this.constantes.angleAcceleration * dt) % (2 * math.pi)
         end
     end
 end
@@ -177,7 +180,7 @@ function this.moveBackState(dt, myTank)
 end
 
 function this.moveRightState(dt, myTank)
-    this.rotate(dt, myTank, 0)
+    this.rotate(dt, myTank, 2 * math.pi)
 end
 
 function this.moveDownState(dt, myTank)

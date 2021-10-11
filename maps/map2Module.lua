@@ -15,12 +15,12 @@ this.tiles =
    25, 26, 25, 26, 25, 26, 25, 26, 25, 26, 25, 26, 25, 26, 25, 26, 25, 26, 25, 26, 25, 26, 25, 26,
    26,  2,  7,  7,  7,  7,  7,  7,  1, 25, 26, 25, 26, 25, 26, 25,  2,  7,  7,  7,  7,  1, 26, 25,
    25,  8, 25, 26, 25, 26, 25, 26,  8, 26, 25, 26, 25, 26, 25, 26,  8, 26, 25, 26, 25,  8, 25, 26,
-   26,  8, 26, 25, 26, 25, 26, 25,  4,  1, 26, 25, 26, 25, 26, 25,  8, 25, 26, 25, 26,  9,  7,  1,
-   25,  9,  1, 26, 25, 26, 25, 26, 25,  8, 25, 26, 25, 26, 25, 26,  8, 26, 25, 26, 25,  8, 25,  8,
-   26,  8,  8, 25, 26, 25, 26, 25, 26,  4,  7,  7,  1, 25, 26,  2,  3, 25, 26, 25, 26,  8, 26,  8,
-   25,  8,  8, 26, 25, 26, 25, 26, 25, 26, 25, 26,  8, 26, 25,  8, 25, 26, 25, 26, 25,  8, 25,  8,
-   26,  8,  8, 25, 26, 25, 26, 25, 26, 25, 26, 25,  8,  2,  7,  3, 26, 25, 26, 25, 26,  8, 26,  8,
-   25,  4, 12, 26, 25, 26, 25, 26, 25, 26, 25, 26,  8,  8, 25, 26, 25, 26, 25, 26, 25,  4, 11,  3,
+   26,  8, 26, 25, 26, 25, 26, 25,  4,  1, 26, 25, 26, 25, 26, 25,  8, 25, 26, 25, 26,  9,  1, 25,
+   25,  9,  1, 26, 25, 26, 25, 26, 25,  8, 25, 26, 25, 26, 25, 26,  8, 26, 25, 26, 25,  8,  8, 26,
+   26,  8,  8, 25, 26, 25, 26, 25, 26,  4,  7,  7,  1, 25, 26,  2,  3, 25, 26, 25, 26,  8,  8, 25,
+   25,  8,  8, 26, 25, 26, 25, 26, 25, 26, 25, 26,  8, 26, 25,  8, 25, 26, 25, 26, 25,  8,  8, 26,
+   26,  8,  8, 25, 26, 25, 26, 25, 26, 25, 26, 25,  8,  2,  7,  3, 26, 25, 26, 25, 26,  8,  8, 25,
+   25,  4, 12, 26, 25, 26, 25, 26, 25, 26, 25, 26,  8,  8, 25, 26, 25, 26, 25, 26, 25,  4, 12, 26,
    26,  2,  3, 25, 26, 25, 26, 25, 26, 25, 26, 25,  4,  6,  7,  7,  1, 25, 26, 25, 26, 25,  8, 25,
    25,  4,  7,  7,  7,  7, 11,  7,  7,  7,  1, 26, 25,  8, 25, 26,  9,  7,  7,  7,  7,  7,  3, 26,
    26, 25, 26, 25, 26, 25,  4,  7,  7,  7, 10,  7,  7, 10,  7,  7,  3, 25, 26, 25, 26, 25, 26, 25,
@@ -39,7 +39,7 @@ this.ennemis =
     { 5, 420, 672, 0 },
     { 5, 1056, 96, 0 },
     { 5, 1056, 672, 0 },
-    { 6, 1376, 384, 3 * math.pi / 2 },
+    { 6, 1440, 352, math.pi / 2 },
 }
 
 -- Bornes de la carte
@@ -47,9 +47,9 @@ local rightBound = this.constantes.tiles.number.x * this.constantes.tiles.size.x
 local bottomBound = this.constantes.tiles.number.y * this.constantes.tiles.size.y
 this.goals = 
 {
-    { 1290, 80, 15 },
-    { 1290, 660, 15 },
-    { 700, 250, 15 }
+    { 1290, 80, 15, true },
+    { 1290, 660, 15, true },
+    { 700, 250, 15, true }
 }
 
 -- Numéro de carte
@@ -143,6 +143,7 @@ function this.init()
         goalHitbox.y = this.goals[i][2]
         goalHitbox.radius = this.goals[i][3]
         goalHitbox.achieved = false
+        goalHitbox.bonus = this.goals[i][4]
         table.insert(this.goalHitbox, goalHitbox)
     end
 end
@@ -171,6 +172,7 @@ function this.CheckPlayerWin()
             goalHitbox.y = this.start[2]
             goalHitbox.radius = 15
             goalHitbox.achieved = false
+            goalHitbox.bonus = false
             table.insert(this.goalHitbox, goalHitbox)
             modules.game.displayGameMessage({"Mission update", "Get back to start to escape", "Stay alive"})
         end
@@ -205,7 +207,7 @@ function this.CheckPlayerLoose()
         local loose = false
         for i, myEnemyTank in ipairs(modules.tank.tanks) do
             if modules.tank.tanks[i].mode == modules.tank.constantes.modes.ennemy then
-                if myEnemyTank.turret.state == 2 then
+                if myEnemyTank.turret.state == 3 then
                     loose = true
                     break
                 end
@@ -254,31 +256,37 @@ function this.draw()
 
     for i, myGoal in ipairs(this.goalHitbox) do
         if myGoal.achieved == false then
-            love.graphics.draw(
-                modules.game.images.bonus, 
-                myGoal.x + modules.game.offset.x, 
-                myGoal.y + modules.game.offset.y, 
-                this.angle, 
-                1, 
-                1, 
-                modules.game.images.bonus:getWidth() / 2, 
-                modules.game.images.bonus:getHeight() / 2)
+            if myGoal.bonus == true then
+                love.graphics.draw(
+                    modules.game.images.bonus, 
+                    myGoal.x + modules.game.offset.x, 
+                    myGoal.y + modules.game.offset.y, 
+                    this.angle, 
+                    1, 
+                    1, 
+                    modules.game.images.bonus:getWidth() / 2, 
+                    modules.game.images.bonus:getHeight() / 2)
+            else
+                love.graphics.setColor(0, 255, 123, 0.75)
+                love.graphics.circle("fill", myGoal.x + modules.game.offset.x, myGoal.x + modules.game.offset.y, myGoal.radius)
+                love.graphics.setColor(255, 255, 255)
+            end
         end
     end
 end
 
 function this.keypressed(key, scancode, isrepeat)
     if key == "escape" then
+        if modules.game.pauseState == true then
+            modules.game.pauseState = false
+        end
         modules.game.changeScreen(modules.game.loadmap, require("maps/mainTitleModule")) 
 
     elseif key == "return" then
         if this.playerWin == true then
             modules.game.changeScreen(modules.game.loadmap, require("maps/mainTitleModule")) 
-        end
-        
-    elseif key == "r" then
-        if this.playerLoose == true then
-            modules.game.changeScreen(modules.game.loadmap, require("maps/map2Module"), modules.game.playerTank.skin) 
+        elseif this.playerLoose == true then
+            modules.game.changeScreen(modules.game.loadmap, require("maps/mainTitleModule")) 
         end
 
     elseif key == "space" then

@@ -9,9 +9,7 @@ io.stdout:setvbuf("no")
 -- Désactive le lissage en cas de scale
 love.graphics.setDefaultFilter("nearest")
 
-function math.prandom(min, max) 
-    return love.math.random() * (max - min) + min 
-end
+math.randomseed(love.timer.getTime())
 
 -- Les modules seront disponibles partout
 modules = {}

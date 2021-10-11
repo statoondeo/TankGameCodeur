@@ -200,8 +200,10 @@ function this.keypressed(key, scancode, isrepeat)
                 this.selectionDirection = 1
             end
         elseif key == "return" then
+            modules.game.sounds.validation:play()
             modules.game.changeScreen(modules.game.loadmap, require("maps/map1Module"), this.tanks[this.currentTank].skin) 
         elseif key == "escape" then
+            modules.game.sounds.validation:play()
             modules.game.changeScreen(modules.game.quitApp) 
         end
     end

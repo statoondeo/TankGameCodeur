@@ -86,12 +86,10 @@ this.obstacles =
     {  0,   695,    183,    0, 1,     false,  false,  8/10, false, 0,  210,  402,  {} },
     {  0,   950,    135,    0, 1,     false,  false,  8/10, false, 0,  75,  497,  {} },
     -- Bornes de l'écran pour éviter que les tanks ou les missiles ne sortent
-    {  0,   -100,   -100,   0,                              1,  true,   true,   1,    false, 0,  love.graphics:getWidth() / 2 + 100,  100,  { 1, 4 } },
-    {  0,   love.graphics:getWidth() / 2,   -100,   0,      1,  true,   true,   1,    false, 0,  love.graphics:getWidth() / 2 + 100,  100,  { 7, 8 } },
-    {  0,   -100,   0,      0,                              1,  true,   true,   1,    false, 0,  100,  love.graphics:getHeight(),  { 1, 4 } },
-    {  0,   -100,   love.graphics:getHeight(),   0,         1,  true,   true,   1,    false, 0,  love.graphics:getWidth() / 2 + 100,  100,  { 1, 4 } },
-    {  0,   love.graphics:getWidth() / 2,   love.graphics:getHeight(),   0,         1,  true,   true,   1,    false, 0,  love.graphics:getWidth() / 2 + 100,  100,  { 7, 8 } },
-    {  0,   love.graphics:getWidth(),   0,      0,          1,  true,   true,   1,    false, 0,  100,  love.graphics:getHeight(),  { 7, 8 } },
+    {  0,   -100,   -90,   0,                              1,  true,   true,   1,    false, 0,  love.graphics:getWidth() + 200,  100,  { 1, 4 } },
+    {  0,   -90,   0,      0,                              1,  true,   true,   1,    false, 0,  100,  love.graphics:getHeight(),  { 1, 4 } },
+    {  0,   -100,   love.graphics:getHeight() - 10,   0,         1,  true,   true,   1,    false, 0,  love.graphics:getWidth() + 200,  100,  { 1, 4 } },
+    {  0,   love.graphics:getWidth() - 10,   0,      0,          1,  true,   true,   1,    false, 0,  100,  love.graphics:getHeight(),  { 1, 4 } },
     -- Zones vides à peupler
     {  0,   90,    360,    0, 1,     true,   true,  1, false, 0,  160,  120,  { 1, 4} },
     {  0,   0,    610,    0, 1,     true,   true,  1, false, 0,  240,  130,  { 1, 4} },
@@ -149,7 +147,7 @@ function this.CheckPlayerLoose()
         local loose = false
         for i, myEnemyTank in ipairs(modules.tank.tanks) do
             if modules.tank.tanks[i].mode == modules.tank.constantes.modes.ennemy then
-                if myEnemyTank.turret.state == 2 then
+                if myEnemyTank.turret.state == 3 then
                     loose = true
                     break
                 end
@@ -169,9 +167,13 @@ function this.update(dt, mouse)
     this.playerLoose = this.CheckPlayerLoose()
     
     if this.playerWin == true then
-        modules.game.mode = modules.game.constantes.modes.initGameEnd
+        if modules.game.mode ~= modules.game.constantes.modes.initGameEnd then
+            modules.game.mode = modules.game.constantes.modes.initGameEnd
+        end
     elseif this.playerLoose == true then
-        modules.game.mode = modules.game.constantes.modes.initGameEnd
+        if modules.game.mode ~= modules.game.constantes.modes.initGameEnd then
+            modules.game.mode = modules.game.constantes.modes.initGameEnd
+        end
     end
     if this.goals[1][4] == false then
         -- Affichage de l'Objectif
@@ -198,25 +200,17 @@ end
 
 function this.keypressed(key, scancode, isrepeat)
     if key == "escape" then
+        if modules.game.pauseState == true then
+            modules.game.pauseState = false
+        end
         modules.game.changeScreen(modules.game.loadmap, require("maps/mainTitleModule")) 
 
     elseif key == "return" then
         if this.playerWin == true then
             modules.game.changeScreen(modules.game.loadmap, require("maps/map2Module"), modules.game.playerTank.skin) 
+        elseif this.playerLoose == true then
+            modules.game.changeScreen(modules.game.loadmap, require("maps/map1Module"), modules.game.playerTank.skin)         
         end
-
-    elseif key == "r" then
-        if this.playerLoose == true then
-            modules.game.changeScreen(modules.game.loadmap, require("maps/map1Module"), modules.game.playerTank.skin) 
-        end
-
-    elseif key == "w" then
-        this.playerWin = true
-        modules.game.mode = modules.game.constantes.modes.initGameEnd
-
-    elseif key == "l" then
-        this.playerLoose = true
-        modules.game.mode = modules.game.constantes.modes.initGameEnd
 
     elseif key == "space" then
         modules.game.switchPause()

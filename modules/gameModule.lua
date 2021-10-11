@@ -17,6 +17,7 @@ this.constantes.modes.gameEnd = 11
 this.constantes.modes.ttl = 0.5
 this.constantes.modes.messageTtl = 2
 this.images = {}
+this.sounds = {}
 this.fonts = {}
 this.fonts.size = {}
 this.fonts.size.tiny = 9
@@ -70,6 +71,8 @@ function this.load()
     this.fonts.medium = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.medium)
     this.fonts.large = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.large)
     this.fonts.giant = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.giant)
+    this.sounds.validation = love.audio.newSource("sounds/confirmation_001.ogg", "static")
+
 end
 
 function this.init(myMap)
@@ -82,7 +85,7 @@ function this.init(myMap)
 
     -- On calcule les balises de la carte, c'est à dire les endroits ou les tanks ennemis vont
     -- changer de direction
-    -- Construction du tablea de correspondance tuile/direction
+    -- Construction du tableau de correspondance tuile/direction
     local tileBeacon = {}
     for i, beacon in ipairs(this.tileBeacons) do
         tileBeacon[beacon[1]] = beacon[2]
@@ -100,7 +103,7 @@ function this.init(myMap)
             newBeacon[2] = (0.5 + (i - 1) % this.map.constantes.tiles.number.x) * this.map.constantes.tiles.size.x
             -- Beacon y
             newBeacon[3] = (0.5 + math.floor((i - 1) / this.map.constantes.tiles.number.x)) * this.map.constantes.tiles.size.y
-            newBeacon[4] = 1                -- Beacon radius
+            newBeacon[4] = 3                -- Beacon radius
             newBeacon[5] = tileBeacon[tile] -- Beacon directions
             table.insert(this.map.beacons, newBeacon)
         end
@@ -137,9 +140,9 @@ function this.init(myMap)
                             this.additionalDecors, 
                             modules.obstacle.create(
                                 love.math.random(myObstacle[13][1], myObstacle[13][2]), 
-                                j + love.math.random(-5, 5), 
-                                k + love.math.random(-5, 5), 
-                                love.math.random() * 2 * math.pi, 
+                                j + 12, 
+                                k + 12, 
+                                love.math.random() * math.pi, 
                                 love.math.random() * 0.8 + 0.4, 
                                 false, 
                                 false,
@@ -149,9 +152,9 @@ function this.init(myMap)
                                 0,
                                 0))
                     end
-                    k = k + 20
+                    k = k + 25
                 end
-                j = j + 20
+                j = j + 25
             end
         end
     end
@@ -261,6 +264,7 @@ function this.update(dt)
         if this.initialTtl > this.constantes.modes.ttl then
             this.initialTtl = 0
             this.mode = this.constantes.modes.gameEnd
+            modules.game.sounds.validation:play()
         end
     elseif this.mode == this.constantes.modes.gameEnd then
         -- On attend une réaction du joueur
@@ -308,7 +312,7 @@ function this.drawGameEnd(myAlpha)
     
     elseif this.map.playerLoose == true then
         mainLabel = "Defeated"
-        actionsLabel = "\"Escape\" to main menu, \"R\" to retry"
+        actionsLabel = "\"Escape\" to main menu, \"Return\" to retry"
 
     end
     
@@ -363,7 +367,7 @@ end
 
 function this.drawMessage()
     -- Affichage du titre de la messagebox
-    love.graphics.setFont(this.fonts.medium)
+    love.graphics.setFont(this.fonts.large)
     local font = love.graphics.getFont()
     local label = this.message[1]
     local availableHeight = this.images.bandeau:getHeight()
@@ -398,20 +402,20 @@ function this.draw()
             math.floor((i - 1) / this.map.constantes.tiles.number.x) * this.map.constantes.tiles.size.y + this.offset.y)
     end
     
-    -- On affiche les balises
-    -- love.graphics.setFont(modules.game.fonts.tiny)
-    -- for i, myBeacon in ipairs(this.map.beacons) do
-    --     local myBeaconHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
-    --     myBeaconHitbox.x = myBeacon[2]
-    --     myBeaconHitbox.y = myBeacon[3]
-    --     myBeaconHitbox.radius = myBeacon[4]
+    -- -- On affiche les balises
+    -- -- love.graphics.setFont(modules.game.fonts.tiny)
+    -- -- for i, myBeacon in ipairs(this.map.beacons) do
+    -- --     local myBeaconHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
+    -- --     myBeaconHitbox.x = myBeacon[2]
+    -- --     myBeaconHitbox.y = myBeacon[3]
+    -- --     myBeaconHitbox.radius = myBeacon[4]
 
-    --     love.graphics.circle("fill", myBeaconHitbox.x + this.offset.x, myBeaconHitbox.y + this.offset.y, myBeaconHitbox.radius)
+    -- --     love.graphics.circle("fill", myBeaconHitbox.x + this.offset.x, myBeaconHitbox.y + this.offset.y, myBeaconHitbox.radius)
 
-    --     love.graphics.setColor(0, 0, 0)
-    --     love.graphics.print(myBeacon[1], myBeaconHitbox.x + this.offset.x, myBeaconHitbox.y + this.offset.y)
-    --     love.graphics.setColor(255, 255, 255)
-    -- end
+    -- --     love.graphics.setColor(0, 0, 0)
+    -- --     love.graphics.print(myBeacon[1], myBeaconHitbox.x + this.offset.x, myBeaconHitbox.y + this.offset.y)
+    -- --     love.graphics.setColor(255, 255, 255)
+    -- -- end
 
     -- On draw les obstacles
     modules.obstacle.draw()
@@ -505,12 +509,14 @@ function this.draw()
 end
 
 function this.displayGameMessage(label)
+    this.sounds.validation:play()
     this.mode = this.constantes.modes.initMessage
     this.message = label
     this.initialTtl = 0
 end
 
 function this.changeScreen(whatToDo, parameter1, parameter2)
+    this.sounds.validation:play()
     this.mode = this.constantes.modes.quit
     this.initialTtl = 0
     this.actionToDo = whatToDo
@@ -519,10 +525,11 @@ function this.changeScreen(whatToDo, parameter1, parameter2)
 end
 
 function this.switchPause()
+    this.sounds.validation:play()
     if this.mode == this.constantes.modes.pause then
         this.mode = this.constantes.modes.quitpause
     elseif this.mode == this.constantes.modes.game then
-    this.mode = this.constantes.modes.initpause
+        this.mode = this.constantes.modes.initpause
     end
 end
 

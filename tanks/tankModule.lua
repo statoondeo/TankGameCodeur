@@ -231,11 +231,11 @@ function this.drawTank(myTank)
     if myTank.drawLife == true then
         -- On dessine la barre de vie des tanks
         love.graphics.setColor(255, 0, 0)
-        love .graphics.rectangle("fill", myTank.x - myTank.center.x + modules.game.offset.x, myTank.y - 2 * myTank.center.y + modules.game.offset.y, 2 * myTank.center.x, this.constantes.lifeBarHeight)
+        love .graphics.rectangle("fill", myTank.x - myTank.center.x + modules.game.offset.x, myTank.y - 1.5 * myTank.center.y + modules.game.offset.y, 2 * myTank.center.x, this.constantes.lifeBarHeight)
         love.graphics.setColor(0, 255, 0)
-        love .graphics.rectangle("fill", myTank.x - myTank.center.x + modules.game.offset.x, myTank.y - 2 * myTank.center.y + modules.game.offset.y, 2 * myTank.center.x * myTank.life / myTank.initialLife, this.constantes.lifeBarHeight)
+        love .graphics.rectangle("fill", myTank.x - myTank.center.x + modules.game.offset.x, myTank.y - 1.5 * myTank.center.y + modules.game.offset.y, 2 * myTank.center.x * myTank.life / myTank.initialLife, this.constantes.lifeBarHeight)
         love.graphics.setColor(255, 255, 255)
-        love .graphics.rectangle("line", myTank.x - myTank.center.x + modules.game.offset.x, myTank.y - 2 * myTank.center.y + modules.game.offset.y, 2 * myTank.center.x, this.constantes.lifeBarHeight)
+        love .graphics.rectangle("line", myTank.x - myTank.center.x + modules.game.offset.x, myTank.y - 1.5 * myTank.center.y + modules.game.offset.y, 2 * myTank.center.x, this.constantes.lifeBarHeight)
     end
 
     -- Spécificités du tank

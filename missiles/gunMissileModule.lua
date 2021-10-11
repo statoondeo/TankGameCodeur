@@ -73,10 +73,10 @@ function this.createChild(myMissile)
     local newMissile = modules.missile.create(myMissile.tank, this.constantes.childMode)
 
     -- Gestion du scope des obus de la rafale
-    newMissile.scope = math.prandom(this.constantes.minScope, this.constantes.maxScope)
+    newMissile.scope = love.math.random(this.constantes.minScope, this.constantes.maxScope)
 
     -- Gestion du angle des obus de la rafale
-    newMissile.angle = math.prandom(myMissile.angle - this.constantes.angleAmplitude, myMissile.angle + this.constantes.angleAmplitude)
+    newMissile.angle = love.math.random(myMissile.angle - this.constantes.angleAmplitude, myMissile.angle + this.constantes.angleAmplitude)
 
     -- Gestion du ttl des obus de la rafale
     newMissile.initialTtl = newMissile.scope / this.constantes.scope * this.constantes.ttl

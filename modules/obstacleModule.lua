@@ -90,17 +90,17 @@ function this.drawObstacle(myObstacle)
     -- if myObstacle.hitBox.type == modules.hitbox.constantes.circleType then
     --     love.graphics.circle("line", myObstacle.hitBox.x + modules.game.offset.x, myObstacle.hitBox.y + modules.game.offset.y, myObstacle.hitBox.radius)
     --     label = myObstacle.hitBox.x .. "/" .. myObstacle.hitBox.y .. "/" .. myObstacle.hitBox.radius
-    --     love.graphics.print(
-    --         label,
-    --         myObstacle.hitBox.x + modules.game.offset.x - font:getWidth(label) / 2,
-    --         myObstacle.hitBox.y + modules.game.offset.y - font:getHeight(label) / 2)
+    --     -- love.graphics.print(
+    --     --     label,
+    --     --     myObstacle.hitBox.x + modules.game.offset.x - font:getWidth(label) / 2,
+    --     --     myObstacle.hitBox.y + modules.game.offset.y - font:getHeight(label) / 2)
     -- elseif myObstacle.hitBox.type == modules.hitbox.constantes.rectangleType then
     --     love.graphics.rectangle("line", myObstacle.hitBox.x + modules.game.offset.x, myObstacle.hitBox.y + modules.game.offset.y, myObstacle.hitBox.width, myObstacle.hitBox.height)
     --     label = myObstacle.hitBox.x .. "/" .. myObstacle.hitBox.y .. "/" .. myObstacle.hitBox.width .. "/" .. myObstacle.hitBox.height
-    --     love.graphics.print(
-    --         label,
-    --         myObstacle.hitBox.x + modules.game.offset.x + (myObstacle.hitBox.width - font:getWidth(label)) / 2,
-    --         myObstacle.hitBox.y + modules.game.offset.y + (myObstacle.hitBox.height - font:getHeight(label)) / 2)
+    --     -- love.graphics.print(
+    --     --     label,
+    --     --     myObstacle.hitBox.x + modules.game.offset.x + (myObstacle.hitBox.width - font:getWidth(label)) / 2,
+    --     --     myObstacle.hitBox.y + modules.game.offset.y + (myObstacle.hitBox.height - font:getHeight(label)) / 2)
     -- end
 end
 

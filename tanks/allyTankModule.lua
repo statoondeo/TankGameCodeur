@@ -6,10 +6,10 @@ this.constantes.modes = {}
 this.constantes.modes.player = 1
 this.constantes.modes.ennemy = 2
 
-this.constantes.acceleration = 1.5
+this.constantes.acceleration = 3
 this.constantes.angleAcceleration = 2
-this.constantes.defaultAcceleration = 1
-this.constantes.maxSpeed = 2.4
+this.constantes.defaultAcceleration = 2
+this.constantes.maxSpeed = 3
 this.constantes.maxSpeedEnnemy = 1
 this.constantes.tailLife = 1
 this.constantes.tailSpeed = 10
