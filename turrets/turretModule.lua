@@ -1,48 +1,13 @@
 local this = {}
 
-this.constantes = {}
-
--- Point de pivot de la tourelle
-this.constantes.offset = {}
-this.constantes.offset.x = 8
-this.constantes.offset.y = 0
-this.constantes.skins = {}
-this.constantes.skins.count = 6
-this.constantes.emotes = {}
-this.constantes.emotes.count = 3
-this.constantes.flames = {}
-this.constantes.flames.count = 5
-this.constantes.flames.speed = 15
-this.images = {}
-this.images.turrets = {}
-this.images.flames = {}
-this.images.emotes = {}
-this.sounds = {}
-
 this.turrets = {}
 this.turretsmodules = {}
-
-function this.load()
-    -- Chargement des ressources
-    for i = 1, this.constantes.skins.count do
-        this.images.turrets[i] = love.graphics.newImage("images/turret_" .. i .. ".png")
-    end 
-    for i = 1, this.constantes.flames.count do
-        this.images.flames[i] = love.graphics.newImage("images/flame_" .. i .. ".png")
-    end  
-    for i = 1, this.constantes.emotes.count do
-        this.images.emotes[i] = love.graphics.newImage("images/emote_" .. i .. ".png")
-    end  
-    this.sounds.alert = love.audio.newSource("sounds/tindeck.mp3", "static")
-
-    -- Chargement des modules
-    table.insert(this.turretsmodules, require("turrets/allyTurretModule"))
-    table.insert(this.turretsmodules, this.turretsmodules[1])
-    table.insert(this.turretsmodules, this.turretsmodules[1])
-    table.insert(this.turretsmodules, require("turrets/ennemyTurretModule"))
-    table.insert(this.turretsmodules, this.turretsmodules[4])
-    table.insert(this.turretsmodules, this.turretsmodules[4])
-end
+table.insert(this.turretsmodules, require("turrets/allyTurretModule"))
+table.insert(this.turretsmodules, this.turretsmodules[1])
+table.insert(this.turretsmodules, this.turretsmodules[1])
+table.insert(this.turretsmodules, require("turrets/ennemyTurretModule"))
+table.insert(this.turretsmodules, this.turretsmodules[4])
+table.insert(this.turretsmodules, this.turretsmodules[4])
 
 -- Factory à tourelles
 function this.create(myTurretSkin, myTank)
@@ -52,14 +17,14 @@ end
 function this.createNew(myTurretSkin, myTank)
     local newTurret = {}
     newTurret.skin = myTurretSkin
-    newTurret.image = this.images.turrets[newTurret.skin]
+    newTurret.image = game.images.turrets[newTurret.skin]
     newTurret.tank = myTank
     newTurret.angle = 0
     newTurret.x = newTurret.tank.turretAnchor.x
     newTurret.y = newTurret.tank.turretAnchor.y
     newTurret.center = {}
-    newTurret.center.x = this.constantes.offset.x
-    newTurret.center.y = newTurret.image:getHeight() / 2 + this.constantes.offset.y
+    newTurret.center.x = game.constantes.turret.offset.x
+    newTurret.center.y = newTurret.image:getHeight() / 2 + game.constantes.turret.offset.y
     newTurret.output = {}
     newTurret.output.x = newTurret.x + math.cos(newTurret.angle) * newTurret.image:getWidth()
     newTurret.output.y = newTurret.x + math.sin(newTurret.angle) * newTurret.image:getHeight()
@@ -67,11 +32,11 @@ function this.createNew(myTurretSkin, myTank)
     newTurret.fireIndex = 0
     newTurret.fireImage = nil
     newTurret.fireImages = {}
-    newTurret.fireImages[1] = this.images.flames[1]
-    newTurret.fireImages[2] = this.images.flames[2]
-    newTurret.fireImages[3] = this.images.flames[3]
-    newTurret.fireImages[4] = this.images.flames[4]
-    newTurret.fireImages[5] = this.images.flames[5]
+    newTurret.fireImages[1] = game.images.flames[1]
+    newTurret.fireImages[2] = game.images.flames[2]
+    newTurret.fireImages[3] = game.images.flames[3]
+    newTurret.fireImages[4] = game.images.flames[4]
+    newTurret.fireImages[5] = game.images.flames[5]
     return newTurret
 end
 
@@ -84,7 +49,7 @@ end
 function this.updateTurret(dt, myTurret, mouse)
     if myTurret.tank.outDated == true then
         -- On avance dans l'animation de feu
-        myTurret.fireTtl = myTurret.fireTtl + this.constantes.flames.speed * dt
+        myTurret.fireTtl = myTurret.fireTtl + game.constantes.turret.flames.speed * dt
         myTurret.fireIndex = math.floor(myTurret.fireTtl) + 1
 
         if myTurret.fireIndex > #myTurret.fireImages then
@@ -116,8 +81,8 @@ function this.drawTurret(myTurret)
         -- Affichage de la flamme
         love.graphics.draw(
             myTurret.fireImage, 
-            math.floor(myTurret.x + modules.game.offset.x), 
-            math.floor(myTurret.y +  modules.game.offset.y),
+            math.floor(myTurret.x + game.offset.x), 
+            math.floor(myTurret.y +  game.offset.y),
             0, 
             sens, 
             1, 
@@ -127,8 +92,8 @@ function this.drawTurret(myTurret)
         -- Affichage de la tourelle
         love.graphics.draw(
             myTurret.image, 
-            math.floor(myTurret.x + modules.game.offset.x), 
-            math.floor(myTurret.y +  modules.game.offset.y),
+            math.floor(myTurret.x + game.offset.x), 
+            math.floor(myTurret.y +  game.offset.y),
             myTurret.angle, 
             1, 
             1, 

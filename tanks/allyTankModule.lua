@@ -17,7 +17,7 @@ this.constantes.initialLife = 1200
 
 -- Factory à tank
 function this.create(myTankMode, myTankSkin, x, y, angle)
-    local myTank = modules.tank.createNew(myTankMode, myTankSkin, x, y, angle)
+    local myTank = game.tank.createNew(myTankMode, myTankSkin, x, y, angle)
     myTank.maxSpeedLimit = this.constantes.maxSpeed - myTankSkin * 0.2
     myTank.maxSpeed = myTank.maxSpeedLimit
     myTank.acceleration = this.constantes.acceleration

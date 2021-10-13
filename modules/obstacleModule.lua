@@ -1,34 +1,22 @@
 local this = {}
 
-this.constantes = {}
-this.constantes.nbObstacleResource = 12
-this.images = {}
-this.obstacles = {}
-
-function this.load()
-    -- Chargement des ressources
-    for i = 1, this.constantes.nbObstacleResource do
-        this.images[i] = love.graphics.newImage("images/obstacle_" .. i .. ".png")
-    end
-end
-
 function this.create(imageIndex, x, y, angle, zoom, stopMissile, stopTank, speedRatio, roundHitBox, radius, width, height)
     local newObstacle = {}
 
     -- Impact sur les collisions
     if roundHitBox ~= nil then
         if roundHitBox == true then
-            newObstacle.hitBox = modules.hitbox.create(modules.hitbox.constantes.circleType)
+            newObstacle.hitBox = game.hitbox.create(game.hitbox.constantes.circleType)
             newObstacle.hitBox.radius = radius
         else
-            newObstacle.hitBox = modules.hitbox.create(modules.hitbox.constantes.rectangleType)
+            newObstacle.hitBox = game.hitbox.create(game.hitbox.constantes.rectangleType)
             newObstacle.hitBox.width = width
             newObstacle.hitBox.height = height
         end
         newObstacle.hitBox.x = x
         newObstacle.hitBox.y = y
     else
-        newObstacle.hitBox = modules.hitbox.create(modules.hitbox.constantes.nonetype)
+        newObstacle.hitBox = game.hitbox.create(game.hitbox.constantes.nonetype)
     end
 
     -- Impact sur le visuel
@@ -36,7 +24,7 @@ function this.create(imageIndex, x, y, angle, zoom, stopMissile, stopTank, speed
     newObstacle.visible = imageIndex ~= 0
     if newObstacle.visible == true then
         newObstacle.imageIndex = imageIndex
-        newObstacle.image = this.images[imageIndex]
+        newObstacle.image = game.images.obstacles[imageIndex]
         newObstacle.center.x = newObstacle.image:getWidth() / 2
         newObstacle.center.y = newObstacle.image:getWidth() / 2
         newObstacle.zoom = zoom
@@ -73,24 +61,24 @@ end
 
 function this.drawObstacle(myObstacle)
     if myObstacle.visible == true then
-        love.graphics.draw(
-            myObstacle.image, 
-            myObstacle.x + modules.game.offset.x, 
-            myObstacle.y + modules.game.offset.y,
-            myObstacle.angle,
-            myObstacle.zoom,
-            myObstacle.zoom,
-            myObstacle.center.x,
-            myObstacle.center.y) 
+            love.graphics.draw(
+                myObstacle.image, 
+                myObstacle.x + game.offset.x, 
+                myObstacle.y + game.offset.y,
+                myObstacle.angle,
+                myObstacle.zoom,
+                myObstacle.zoom,
+                myObstacle.center.x,
+                myObstacle.center.y) 
     end
 end
 
 function this.ManageMissileObstacleCollision(myMissile, myObstacle)
-    if myObstacle.hitBox.type ~= modules.hitbox.constantes.noneType and myMissile.exploded == false then
-        if modules.hitbox.IsCollision(myObstacle.hitBox, myMissile.hitBox) then
+    if myObstacle.hitBox.type ~= game.hitbox.constantes.noneType and myMissile.exploded == false then
+        if game.hitbox.IsCollision(myObstacle.hitBox, myMissile.hitBox) then
 
             -- On replace le missile à l'extérieur de l'obstacle pour son explosion                            
-            while modules.missile.rewind(myMissile) and modules.hitbox.IsCollision(myObstacle.hitBox, myMissile.hitBox) do end
+            while game.missile.rewind(myMissile) and game.hitbox.IsCollision(myObstacle.hitBox, myMissile.hitBox) do end
             
             -- Le missile explose
             myMissile.exploded = true
@@ -100,16 +88,16 @@ end
 
 function this.ManageMissileTankCollision(myMissile, myTank)
     if myMissile.tank.mode ~= myTank.mode then
-        if modules.hitbox.IsCollision(myMissile.hitBox, myTank.hitBox) then
+        if game.hitbox.IsCollision(myMissile.hitBox, myTank.hitBox) then
 
             -- On replace le missile à l'extérieur de l'obstacle pour son explosion                            
-            while modules.missile.rewind(myMissile) and modules.hitbox.IsCollision(myMissile.hitBox, myMissile.hitBox) do end
+            while game.missile.rewind(myMissile) and game.hitbox.IsCollision(myMissile.hitBox, myMissile.hitBox) do end
             
             -- Le missile explose
             myMissile.exploded = true
 
             -- On inflige des dégats au tank
-            modules.tank.Damage(myTank, myMissile.damage.missile)
+            game.tank.Damage(myTank, myMissile.damage.missile)
         end
     end
 end
@@ -117,23 +105,23 @@ end
 function this.ManageExplosionTankCollision(myMissile, myTank)
     if myMissile.tank.mode ~= myTank.mode then
         -- On inflige des dégats d'explosion au tank
-        local explosionHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
+        local explosionHitbox = game.hitbox.create(game.hitbox.constantes.circleType)
         explosionHitbox.x = myMissile.x
         explosionHitbox.y = myMissile.y
-        explosionHitbox.radius = myMissile.explosionZoom * modules.missile.images.explosions[1]:getWidth() / 2
-        if modules.hitbox.IsCollision(explosionHitbox, myTank.hitBox) == true and myMissile.explosionDamageDone == false then
+        explosionHitbox.radius = myMissile.explosionZoom * game.images.explosions[1]:getWidth() / 2
+        if game.hitbox.IsCollision(explosionHitbox, myTank.hitBox) == true and myMissile.explosionDamageDone == false then
             -- On inflige des dégats au tank
-            modules.tank.Damage(myTank, myMissile.damage.explosion)
+            game.tank.Damage(myTank, myMissile.damage.explosion)
         end
     end
 end
 
 function this.ManageTankObstacleCollision(myTank, myObstacle)
-    if myObstacle.hitBox.type ~= modules.hitbox.constantes.noneType and modules.hitbox.IsCollision(myObstacle.hitBox, myTank.hitBox) then
+    if myObstacle.hitBox.type ~= game.hitbox.constantes.noneType and game.hitbox.IsCollision(myObstacle.hitBox, myTank.hitBox) then
 
         if myObstacle.stopTank == true then
             -- On replace le tank à l'extérieur de l'obstacle
-            while modules.tank.rewind(myTank) and modules.hitbox.IsCollision(myObstacle.hitBox, myTank.hitBox) do end
+            while game.tank.rewind(myTank) and game.hitbox.IsCollision(myObstacle.hitBox, myTank.hitBox) do end
 
             -- Le tank est arrété
             myTank.vector.x = 0
@@ -147,9 +135,9 @@ function this.ManageTankObstacleCollision(myTank, myObstacle)
 end
 
 function this.ManageTankTankCollision(myTank, myOtherTank)
-    if modules.hitbox.IsCollision(myTank.hitBox, myOtherTank.hitBox) then
+    if game.hitbox.IsCollision(myTank.hitBox, myOtherTank.hitBox) then
         -- On replace le tank à l'extérieur de l'obstacle
-        while modules.hitbox.IsCollision(myTank.hitBox, myOtherTank.hitBox) and modules.tank.rewind(myTank) do end
+        while game.hitbox.IsCollision(myTank.hitBox, myOtherTank.hitBox) and game.tank.rewind(myTank) do end
 
         -- Le tank est arrété
         myTank.vector.x = 0
@@ -160,19 +148,17 @@ function this.ManageTankTankCollision(myTank, myOtherTank)
 end
 
 function this.ManageTankGroundCollision(myTank, myObstacle)
-    local speedModifier = 1
-    if myObstacle.hitBox.type ~= modules.hitbox.constantes.noneType and modules.hitbox.IsCollision(myObstacle.hitBox, myTank.hitBox) then
+    if myObstacle.hitBox.type ~= game.hitbox.constantes.noneType and game.hitbox.IsCollision(myObstacle.hitBox, myTank.hitBox) then
         -- Les modificateurs de vitesse se cumulent entre eux
-        speedModifier = myObstacle.speedRatio
+        myTank.speedFactor = myTank.speedFactor * myObstacle.speedRatio
     end
-    return speedModifier
 end
 
 -- Calculs de collision
 function this.ManageCollision()
 
     -- Gestion des missiles
-    for i, myMissile in pairs(modules.missile.missiles) do
+    for i, myMissile in pairs(game.missile.missiles) do
         
         -- Est-ce que le missile actif rencontre un obstacle
         if myMissile.exploded == false then
@@ -188,7 +174,7 @@ function this.ManageCollision()
         
         if myMissile.exploded == false then
         -- Est-ce que le missile rencontre un tank
-            for i, myTank in ipairs(modules.tank.tanks) do
+            for i, myTank in ipairs(game.tank.tanks) do
                 this.ManageMissileTankCollision(myMissile, myTank)
                 if myMissile.exploded == true then
                     break
@@ -197,7 +183,7 @@ function this.ManageCollision()
         else
             -- Est-ce que l'explosion rencontre un tank
             if myMissile.explosionDamageDone == false then
-                for i, myTank in ipairs(modules.tank.tanks) do
+                for i, myTank in ipairs(game.tank.tanks) do
                     this.ManageExplosionTankCollision(myMissile, myTank)
                 end
                 myMissile.explosionDamageDone = true
@@ -208,7 +194,7 @@ function this.ManageCollision()
     end
 
     -- Gestion des tanks
-    for i, myTank in pairs(modules.tank.tanks) do
+    for i, myTank in pairs(game.tank.tanks) do
         local tankStopped = false
         myTank.speedFactor = 1
 
@@ -223,7 +209,7 @@ function this.ManageCollision()
         if tankStopped == false then
 
             -- Est-ce que le tank rencontre un tank
-            for i, myOtherTank in ipairs(modules.tank.tanks) do
+            for i, myOtherTank in ipairs(game.tank.tanks) do
                 if myOtherTank ~= myTank then
                     tankStopped = this.ManageTankTankCollision(myOtherTank, myTank)
                 end
@@ -232,11 +218,11 @@ function this.ManageCollision()
 
         if tankStopped == false then
             -- Récupération de la dalle du tank
-            local colonne = math.floor(myTank.x / modules.game.map.constantes.tiles.size.x) + 1 
-            local ligne = math.floor(myTank.y / modules.game.map.constantes.tiles.size.y) + 1  
-            local tile = modules.game.map.tiles[ligne * modules.game.map.constantes.tiles.number.x + colonne]
-            if modules.game.map.modifiers[tile] ~= nil then
-                myTank.speedFactor = myTank.speedFactor * modules.game.map.modifiers[tile]
+            local colonne = math.floor(myTank.x / game.map.constantes.tiles.size.x) + 1 
+            local ligne = math.floor(myTank.y / game.map.constantes.tiles.size.y) + 1  
+            local tile = game.map.tiles[ligne * game.map.constantes.tiles.number.x + colonne]
+            if game.map.modifiers[tile] ~= nil then
+                myTank.speedFactor = myTank.speedFactor * game.map.modifiers[tile]
             end
             
             -- On applique les changements de vitesse

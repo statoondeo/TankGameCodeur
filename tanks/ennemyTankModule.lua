@@ -29,7 +29,7 @@ this.constantes.states.magneticTtl = 1
 
 -- Factory à tank
 function this.create(myTankMode, myTankSkin, x, y, angle)
-    local myTank = modules.tank.createNew(myTankMode, myTankSkin, x, y, angle)
+    local myTank = game.tank.createNew(myTankMode, myTankSkin, x, y, angle)
     myTank.maxSpeedLimit = this.constantes.maxSpeed
     myTank.maxSpeed = myTank.maxSpeedLimit
     myTank.acceleration = this.constantes.acceleration
@@ -46,13 +46,13 @@ end
 
 function this.updateTank(dt, myTank)
     -- Est-ce que le tank rencontre une balise directionnelle?
-    local myTankHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
+    local myTankHitbox = game.hitbox.create(game.hitbox.constantes.circleType)
     myTankHitbox.x = myTank.hitBox.x
     myTankHitbox.y = myTank.hitBox.y
     myTankHitbox.radius = 2
-    for i, myBeacon in ipairs(modules.game.map.beacons) do
+    for i, myBeacon in ipairs(game.map.beacons) do
         -- Préparation à la rencontre avec une balise, on ralentit
-        if modules.hitbox.IsCollision(myTank.hitBox, myBeacon) and myBeacon.id ~= myTank.lastBeacon and myTank.state ~= this.constantes.states.moveStop then
+        if game.hitbox.IsCollision(myTank.hitBox, myBeacon) and myBeacon.id ~= myTank.lastBeacon and myTank.state ~= this.constantes.states.moveStop then
             myTank.state = this.constantes.states.moveStop
             -- tank pris en charge par la balise
             myTank.beaconTtl = 0
@@ -68,9 +68,9 @@ function this.updateTank(dt, myTank)
     if myTank.checkTtl <= 0 then
         local collision
         --Est-ce que le tank rencontre un tank
-        for i, myOtherTank in ipairs(modules.tank.tanks) do
+        for i, myOtherTank in ipairs(game.tank.tanks) do
             if myOtherTank ~= myTank then
-                collision = modules.hitbox.IsCollision(myTank.hitBox, myOtherTank.hitBox)
+                collision = game.hitbox.IsCollision(myTank.hitBox, myOtherTank.hitBox)
                 if collision == true then
                     break
                 end
@@ -79,9 +79,9 @@ function this.updateTank(dt, myTank)
 
         if collision == false then
             --Est-ce que le tank rencontre un obstacle
-            for i, myObstacle in ipairs(modules.obstacle.obstacles) do
+            for i, myObstacle in ipairs(game.obstacle.obstacles) do
                 if myObstacle.stopTank == true then
-                    collision = modules.hitbox.IsCollision(myTank.hitBox, myObstacle.hitBox)
+                    collision = game.hitbox.IsCollision(myTank.hitBox, myObstacle.hitBox)
                     if collision == true then
                         break
                     end
@@ -136,8 +136,8 @@ function this.moveStopState(dt, myTank)
         myTank.beacon = nil
         myTank.beaconTtl = this.constantes.states.magneticTtl
     else
-        myTank.x = myTank.beaconX + myTank.beaconDistX * modules.tweening.easingLin(myTank.beaconTtl / this.constantes.states.magneticTtl)
-        myTank.y = myTank.beaconY + myTank.beaconDistY * modules.tweening.easingLin(myTank.beaconTtl / this.constantes.states.magneticTtl)
+        myTank.x = myTank.beaconX + myTank.beaconDistX * game.tweening.easingLin(myTank.beaconTtl / this.constantes.states.magneticTtl)
+        myTank.y = myTank.beaconY + myTank.beaconDistY * game.tweening.easingLin(myTank.beaconTtl / this.constantes.states.magneticTtl)
     end
 end
 

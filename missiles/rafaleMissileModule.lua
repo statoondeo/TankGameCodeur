@@ -11,7 +11,7 @@ this.constantes.reload = 1
 this.constantes.explosionZoom = 1.5
 this.constantes.ttl = 2
 this.constantes.nbStep = 0.25
-this.constantes.easing = modules.tweening.easingLin
+this.constantes.easing = game.tweening.easingLin
 this.constantes.delay = 0.2
 this.constantes.childMode = 1
 this.constantes.fire = {}
@@ -30,7 +30,7 @@ this.constantes.shake.time = 0.2
 
 -- Factory à missiles
 function this.create(myTank)
-    local myMissile = modules.missile.createNewMissile(this.constantes.mode, myTank)
+    local myMissile = game.missile.createNewMissile(this.constantes.mode, myTank)
     this.init(myMissile)
     return (myMissile)
 end
@@ -38,7 +38,7 @@ end
 -- Initialisations spécifiques au type de missile
 function this.init(myMissile)
     myMissile.module = this
-    myMissile.image = modules.missile.images.missiles[2]
+    myMissile.image = game.images.missiles[2]
     myMissile.explosionZoom = this.constantes.explosionZoom
     myMissile.step = 0    
     myMissile.initialTtl = this.constantes.ttl
@@ -56,8 +56,8 @@ function this.init(myMissile)
     myMissile.lastShot = 0
     myMissile.fireImage = nil
     myMissile.fireImages = {}
-    myMissile.fireImages[1] = modules.missile.images.fires[1]
-    myMissile.fireImages[2] = modules.missile.images.fires[3]
+    myMissile.fireImages[1] = game.images.fires[1]
+    myMissile.fireImages[2] = game.images.fires[3]
     myMissile.fireImages[3] = myMissile.fireImages[1]
     myMissile.fireSpeed = this.constantes.fire.speed
     myMissile.fireZoom = this.constantes.fire.zoom 
@@ -65,15 +65,15 @@ function this.init(myMissile)
     myMissile.damage = {}
     myMissile.damage.missile = this.constantes.damage.missile
     myMissile.damage.explosion = this.constantes.damage.explosion
-    myMissile.explosionHitbox.radius = this.constantes.explosionZoom * modules.missile.images.missiles[1]:getWidth()
+    myMissile.explosionHitbox.radius = this.constantes.explosionZoom * game.images.missiles[1]:getWidth()
     myMissile.amplitudeShake = this.constantes.shake.amplitude
     myMissile.timeShake = this.constantes.shake.time
-    table.insert(modules.missile.missiles, myMissile)
+    table.insert(game.missile.missiles, myMissile)
 end
 
 function this.createChild(myMissile, index)
     -- Création et initialisation du nouveau missile
-    local newMissile = modules.missile.create(myMissile.tank, this.constantes.childMode)
+    local newMissile = game.missile.create(myMissile.tank, this.constantes.childMode)
 
     newMissile.scope = love.math.random(this.constantes.childMinScope, this.constantes.childMaxScope)
     newMissile.initialTtl = newMissile.scope / this.constantes.maxScope * newMissile.initialTtl
@@ -85,10 +85,10 @@ function this.createChild(myMissile, index)
     newMissile.hitBox.y = newMissile.initialy
     newMissile.damage.missile = this.constantes.childDamage
     newMissile .damage.explosion = this.constantes.childDamage / 2
-    modules.missile.updateFireSound(newMissile)
+    game.missile.updateFireSound(newMissile)
 
     -- Ajout à la collection de missiles
-    table.insert(modules.missile.missiles, newMissile)
+    table.insert(game.missile.missiles, newMissile)
 end
 
 function this.update(dt, myMissile)

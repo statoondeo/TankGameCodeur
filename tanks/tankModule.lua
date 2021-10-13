@@ -2,22 +2,6 @@ local this = {}
 
 this.constantes = {}
 
-this.constantes.skins = {}
-this.constantes.skins.number = {}
-this.constantes.skins.number.player = 3
-this.constantes.skins.number.ennemy = 3
-this.constantes.skins.number.total = 6
-this.constantes.skins.playerRed = 2
-this.constantes.skins.playerBlue = 3
-this.constantes.skins.playerGreen = 4
-this.constantes.skins.ennemySmall = 5
-this.constantes.skins.ennemyMedium = 6
-this.constantes.skins.ennemyLarge = 7
-
-this.constantes.modes = {}
-this.constantes.modes.player = 1
-this.constantes.modes.ennemy = 2
-
 this.constantes.acceleration = 2
 this.constantes.angleAcceleration = 2
 this.constantes.defaultAcceleration = 2
@@ -31,26 +15,12 @@ this.constantes.turretAnchorOffset = {}
 this.constantes.turretAnchorOffset.x = 5
 this.constantes.turretAnchorOffset.y = 0
 
-this.images = {}
-this.images.tanks = {}
-
 this.tanks = {}
 this.tanksModules = {}
+table.insert(this.tanksModules, require("tanks/allyTankModule"))
+table.insert(this.tanksModules, require("tanks/ennemyTankModule"))
 
 this.nextId = 1
-
--- Chargement du module
-function this.load()
-    -- Chargement des ressources
-    for i = 1, this.constantes.skins.number.total do
-        this.images.tanks[i] = love.graphics.newImage("images/tank_" .. i .. ".png")
-    end
-    this.images.trace = love.graphics.newImage("images/trace.png")
-
-    -- Chargement des modules 
-    table.insert(this.tanksModules, require("tanks/allyTankModule"))
-    table.insert(this.tanksModules, require("tanks/ennemyTankModule"))
-end
 
 -- Factory à tank
 function this.create(myTankMode, myTankSkin, x, y, angle)
@@ -66,8 +36,8 @@ function this.createNew(myTankMode, myTankSkin, x, y, angle)
     myTank.missileModule = myTankSkin
     myTank.maxSpeedLimit = this.constantes.maxSpeed
     myTank.skin = myTankSkin
-    myTank.imageTank = this.images.tanks[myTankSkin - 1]
-    myTank.imageTrace = this.images.trace
+    myTank.imageTank = game.images.tanks[myTankSkin - 1]
+    myTank.imageTrace = game.images.tanks.trace
     myTank.angle = angle
     myTank.initialx = x
     myTank.initialy = y
@@ -86,11 +56,11 @@ function this.createNew(myTankMode, myTankSkin, x, y, angle)
     myTank.turretAnchor.y = myTank.y
     myTank.tailFrame = 0
     myTank.tails = {}
-    myTank.hitBox = modules.hitbox.create(modules.hitbox.constantes.circleType)
+    myTank.hitBox = game.hitbox.create(game.hitbox.constantes.circleType)
     myTank.hitBox.x = myTank.x
     myTank.hitBox.y = myTank.y
     myTank.hitBox.radius = myTank.imageTank:getWidth() / 2
-    myTank.turret = modules.turret.create(myTankSkin - 1, myTank)
+    myTank.turret = game.turret.create(myTankSkin - 1, myTank)
     myTank.isFired = false
     myTank.outDated = false
     myTank.drawLife = true
@@ -201,8 +171,8 @@ function this.drawtail(myTank, myTail)
     love.graphics.setColor(255, 255, 255, myTail.ttl)
     love.graphics.draw(
         myTank.imageTrace, 
-        math.floor(myTail.x + modules.game.offset.x), 
-        math.floor(myTail.y + modules.game.offset.y), 
+        math.floor(myTail.x + game.offset.x), 
+        math.floor(myTail.y + game.offset.y), 
         myTail.angle, 
         1, 
         1, 
@@ -223,8 +193,8 @@ function this.drawTank(myTank)
     -- Affichage du tank
     love.graphics.draw(
         myTank.imageTank, 
-        math.floor(myTank.x + modules.game.offset.x), 
-        math.floor(myTank.y + modules.game.offset.y), 
+        math.floor(myTank.x + game.offset.x), 
+        math.floor(myTank.y + game.offset.y), 
         myTank.angle, 
         1, 
         1, 
@@ -236,22 +206,22 @@ function this.drawTank(myTank)
         love.graphics.setColor(255, 0, 0)
         love .graphics.rectangle(
             "fill", 
-            math.floor(myTank.x - myTank.center.x + modules.game.offset.x), 
-            math.floor(myTank.y - 1.5 * myTank.center.y + modules.game.offset.y), 
+            math.floor(myTank.x - myTank.center.x + game.offset.x), 
+            math.floor(myTank.y - 1.5 * myTank.center.y + game.offset.y), 
             math.floor(2 * myTank.center.x), 
             this.constantes.lifeBarHeight)
         love.graphics.setColor(0, 255, 0)
         love .graphics.rectangle(
             "fill", 
-            math.floor(myTank.x - myTank.center.x + modules.game.offset.x), 
-            math.floor(myTank.y - 1.5 * myTank.center.y + modules.game.offset.y), 
+            math.floor(myTank.x - myTank.center.x + game.offset.x), 
+            math.floor(myTank.y - 1.5 * myTank.center.y + game.offset.y), 
             math.floor(2 * myTank.center.x * myTank.life / myTank.initialLife), 
             this.constantes.lifeBarHeight)
         love.graphics.setColor(255, 255, 255)
         love .graphics.rectangle(
             "line", 
-            math.floor(myTank.x - myTank.center.x + modules.game.offset.x), 
-            math.floor(myTank.y - 1.5 * myTank.center.y + modules.game.offset.y), 
+            math.floor(myTank.x - myTank.center.x + game.offset.x), 
+            math.floor(myTank.y - 1.5 * myTank.center.y + game.offset.y), 
             math.floor(2 * myTank.center.x), 
             this.constantes.lifeBarHeight)
     end
@@ -262,13 +232,13 @@ end
 
 function this.fire(myTank)
     if myTank.lastShot <= 0 then
-        local myMissile = modules.missile.create(myTank, myTank.missileModule)
+        local myMissile = game.missile.create(myTank, myTank.missileModule)
         myTank.lastShot = myMissile.reload
         myTank.module.fire(myTank)
         myTank.isFired = true
-        modules.game.fireShake = true
-        modules.game.amplitudeShake = myMissile.amplitudeShake
-        modules.game.fireShakeTtl = myMissile.timeShake
+        game.fireShake = true
+        game.amplitudeShake = myMissile.amplitudeShake
+        game.fireShakeTtl = myMissile.timeShake
     end
 end
 

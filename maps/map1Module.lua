@@ -9,7 +9,7 @@ this.constantes.tiles.size.y = 64
 this.constantes.tiles.number = {}
 this.constantes.tiles.number.x = 16
 this.constantes.tiles.number.y = 12
-this.music = modules.game.musics.map1
+this.music = game.musics.map1
 
 this.tiles = 
 {
@@ -92,7 +92,7 @@ function this.init()
     this.playerLoose = false
     this.playerDetected = false
     this.missionStep = 1
-    this.goalHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
+    this.goalHitbox = game.hitbox.create(game.hitbox.constantes.circleType)
     this.goalHitbox.x = (this.goals[1][1] - 0.5) * this.constantes.tiles.size.x
     this.goalHitbox.y = (this.goals[1][2] - 0.5) * this.constantes.tiles.size.y
     this.goalHitbox.radius = this.goals[1][3]
@@ -104,24 +104,24 @@ function this.init()
 end
 
 function this.endInit()
-    modules.game.displayGameMessage({"Mission", "Find and get ammo stock", "Don't get detected"})
+    game.displayGameMessage({"Mission", "Find and get ammo stock", "Don't get detected"})
 end
 
 function this.CheckPlayerWin()
     -- On vérifie la condition de victoire (tous les tanks ennemis vaincus)
     local win = false
     if this.missionStep == 1 then
-        if modules.hitbox.IsCollision(modules.game.playerTank.hitBox, this.goalHitbox) == true then
+        if game.hitbox.IsCollision(game.playerTank.hitBox, this.goalHitbox) == true then
             this.goals[1][4] = true
             this.missionStep = 2
             this.destroyedTank = 0
-            modules.game.displayGameMessage({"Mission update", "Seek and destroy all enemy Tanks", "Stay alive"})
-            modules.game.sounds.validation:play()
+            game.displayGameMessage({"Mission update", "Seek and destroy all enemy Tanks", "Stay alive"})
+            game.sounds.validation:play()
         end
     elseif this.missionStep == 2 then
         this.destroyedTank = 0
-        for i, myTank in ipairs(modules.tank.tanks) do
-            if myTank.mode == modules.tank.constantes.modes.ennemy then
+        for i, myTank in ipairs(game.tank.tanks) do
+            if myTank.mode == game.constantes.tank.modes.ennemy then
                 if myTank.outDated == true then
                     this.destroyedTank =  this.destroyedTank + 1
                 end
@@ -136,8 +136,8 @@ function this.CheckPlayerLoose()
     if this.missionStep == 1 then
         -- On vérifie la condition de défaite (le tank joueur détecté)
         local loose = false
-        for i, myEnemyTank in ipairs(modules.tank.tanks) do
-            if modules.tank.tanks[i].mode == modules.tank.constantes.modes.ennemy then
+        for i, myEnemyTank in ipairs(game.tank.tanks) do
+            if game.tank.tanks[i].mode == game.constantes.tank.modes.ennemy then
                 if myEnemyTank.turret.state == 3 then
                     loose = true
                     break
@@ -147,7 +147,7 @@ function this.CheckPlayerLoose()
         return loose
     elseif this.missionStep == 2 then
         -- On vérifie la condition de défaite (le tank joueur détruit)
-        return modules.game.playerTank.outDated
+        return game.playerTank.outDated
     end
 end
 
@@ -158,12 +158,12 @@ function this.update(dt, mouse)
     this.playerLoose = this.CheckPlayerLoose()
     
     if this.playerWin == true then
-        if modules.game.mode ~= modules.game.constantes.modes.initGameEnd then
-            modules.game.mode = modules.game.constantes.modes.initGameEnd
+        if game.mode ~= game.constantes.modes.initGameEnd then
+            game.mode = game.constantes.modes.initGameEnd
         end
     elseif this.playerLoose == true then
-        if modules.game.mode ~= modules.game.constantes.modes.initGameEnd then
-            modules.game.mode = modules.game.constantes.modes.initGameEnd
+        if game.mode ~= game.constantes.modes.initGameEnd then
+            game.mode = game.constantes.modes.initGameEnd
         end
     end
     if this.goals[1][4] == false then
@@ -173,7 +173,7 @@ function this.update(dt, mouse)
 end
 
 function this.draw()
-    love.graphics.setFont(modules.game.fonts.small)
+    love.graphics.setFont(game.fonts.small)
     local font = love.graphics.getFont()
     local label
     if this.missionStep == 1 then
@@ -185,38 +185,38 @@ function this.draw()
 
     if this.goals[1][4] == false then
         -- Affichage de l'Objectif
-        love.graphics.draw(modules.game.images.bonus, 
+        love.graphics.draw(game.images.bonus, 
             math.floor(this.goalHitbox.x), 
             math.floor(this.goalHitbox.y), 
             this.goalHitbox.angle, 
             1, 
             1, 
-            math.floor(modules.game.images.bonus:getWidth() / 2), 
-            math.floor(modules.game.images.bonus:getHeight() / 2))
+            math.floor(game.images.bonus:getWidth() / 2), 
+            math.floor(game.images.bonus:getHeight() / 2))
     end
 end
 
 function this.keypressed(key, scancode, isrepeat)
     if key == "escape" then
-        if modules.game.pauseState == true then
-            modules.game.pauseState = false
+        if game.pauseState == true then
+            game.pauseState = false
         end
-        modules.game.changeScreen(modules.game.loadmap, require("maps/mainTitleModule")) 
+        game.changeScreen(game.loadmap, require("maps/mainTitleModule")) 
 
     elseif key == "return" then
         if this.playerWin == true then
-            modules.game.changeScreen(modules.game.loadmap, require("maps/map2Module"), modules.game.playerTank.skin) 
+            game.changeScreen(game.loadmap, require("maps/map2Module"), game.playerTank.skin) 
         elseif this.playerLoose == true then
-            modules.game.changeScreen(modules.game.loadmap, require("maps/map1Module"), modules.game.playerTank.skin)         
+            game.changeScreen(game.loadmap, require("maps/map1Module"), game.playerTank.skin)         
         end
 
     elseif key == "space" then
-        modules.game.switchPause()
+        game.switchPause()
     end
 end
 
 function this.mousepressed(x, y, button, istouch, presses)  
-    modules.tank.fire(modules.game.playerTank)
+    game.tank.fire(game.playerTank)
 end
 
 return this

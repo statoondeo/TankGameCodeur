@@ -11,7 +11,7 @@ this.constantes.minScope = 25
 this.constantes.maxScope = 150
 this.constantes.explosionZoom = 2
 this.constantes.ttl = 2
-this.constantes.easing = modules.tweening.easingInExpo
+this.constantes.easing = game.tweening.easingInExpo
 this.constantes.fire = {}
 this.constantes.fire.speed = 25
 this.constantes.fire.zoom = 1.8
@@ -26,7 +26,7 @@ this.constantes.shake.time = 0.25
 
 -- Factory à missiles
 function this.create(myTank)
-    local myMissile = modules.missile.createNewMissile(this.constantes.mode, myTank)
+    local myMissile = game.missile.createNewMissile(this.constantes.mode, myTank)
     this.init(myMissile)
     return (myMissile)
 end
@@ -40,7 +40,7 @@ function this.init(myMissile)
     myMissile.ttl = myMissile.initialTtl
     myMissile.scope = this.constantes.scope
     myMissile.easing = this.constantes.easing
-    myMissile.image = modules.missile.images.missiles[3]
+    myMissile.image = game.images.missiles[3]
     myMissile.center = {}
     myMissile.center.x = myMissile.image:getWidth() / 2
     myMissile.center.y = myMissile.image:getHeight() / 2
@@ -52,29 +52,29 @@ function this.init(myMissile)
     myMissile.octave = 0.5
     myMissile.reload = this.constantes.reload
     myMissile.fireImages = {}
-    myMissile.fireImages[1] = modules.missile.images.fires[1]
-    myMissile.fireImages[2] = modules.missile.images.fires[2]
-    myMissile.fireImages[3] = modules.missile.images.fires[3]
-    myMissile.fireImages[4] = modules.missile.images.fires[4]
+    myMissile.fireImages[1] = game.images.fires[1]
+    myMissile.fireImages[2] = game.images.fires[2]
+    myMissile.fireImages[3] = game.images.fires[3]
+    myMissile.fireImages[4] = game.images.fires[4]
     myMissile.fireImages[5] = myMissile.fireImages[4]
     myMissile.fireImages[6] = myMissile.fireImages[3]
     myMissile.fireImages[7] = myMissile.fireImages[2]
     myMissile.fireImages[8] = myMissile.fireImages[1]
     myMissile.fireSpeed = this.constantes.fire.speed
     myMissile.fireZoom = this.constantes.fire.zoom 
-    myMissile.rocketImage = modules.missile.images.fires[1]
+    myMissile.rocketImage = game.images.fires[1]
     myMissile.damage = {}
     myMissile.damage.missile = this.constantes.damage.missile
     myMissile.damage.explosion = this.constantes.damage.explosion
-    myMissile.explosionHitbox.radius = this.constantes.explosionZoom * modules.missile.images.missiles[1]:getWidth()
+    myMissile.explosionHitbox.radius = this.constantes.explosionZoom * game.images.missiles[1]:getWidth()
     myMissile.amplitudeShake = this.constantes.shake.amplitude
     myMissile.timeShake = this.constantes.shake.time
-    table.insert(modules.missile.missiles, myMissile)
+    table.insert(game.missile.missiles, myMissile)
 end
 
 -- Génération de missile de replique du missile explosif
 function this.createChild(myMissile, index)
-    local newMissile = modules.missile.create(myMissile.tank, this.constantes.childMode)
+    local newMissile = game.missile.create(myMissile.tank, this.constantes.childMode)
 
     newMissile.scope = love.math.random(this.constantes.minScope, this.constantes.maxScope)
     newMissile.initialTtl = newMissile.scope / this.constantes.maxScope * newMissile.initialTtl
@@ -87,7 +87,7 @@ function this.createChild(myMissile, index)
     myMissile.damage.missile = this.constantes.childDamage
     myMissile.damage.explosion = this.constantes.childDamage / 2
 
-    table.insert(modules.missile.missiles, newMissile)
+    table.insert(game.missile.missiles, newMissile)
 end
 
 function this.update(dt, myMissile)
@@ -104,8 +104,8 @@ end
 function this.draw(myMissile)
     love.graphics.draw(
         myMissile.rocketImage, 
-        math.floor(myMissile.x + modules.game.offset.x), 
-        math.floor(myMissile.y + modules.game.offset.y), 
+        math.floor(myMissile.x + game.offset.x), 
+        math.floor(myMissile.y + game.offset.y), 
         myMissile.angle, 
         -1, 
         1, 

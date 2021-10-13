@@ -1,29 +1,5 @@
 local this = {}
 
-this.constantes = {}
-
--- Explosion
-this.constantes.explosion = {}
-this.constantes.explosion.speed = 12
-this.constantes.explosion.frame = 5
-
--- Missiles
-this.constantes.missile = {}
-this.constantes.missile.frame = 3
-
--- Tirs
-this.constantes.fire = {}
-this.constantes.fire.frame = 4
-
--- Ressources
-this.images = {}
-this.images.explosions = {}
-this.images.fires = {}
-this.images.missiles = {}
-this.sounds = {}
-this.sounds.explosions = {}
-this.sounds.shots = {}
-
 -- Stockage des missiles créés
 this.missiles = {}
 
@@ -32,34 +8,14 @@ this.missilesModules = {}
 -- Id des missiles
 this.nextId = 1
 
--- Pour le chargement du module
-function this.load()
-    -- Chargement des ressources
-    -- Sons
-    table.insert(this.sounds.explosions, love.audio.newSource("sounds/explosion.mp3", "static"))
-    -- Missiles
-    for i = 1, this.constantes.missile.frame do
-        this.images.missiles[i] = love.graphics.newImage("images/missile_" .. i .. ".png")
-    end
-    -- Explosion
-    for i = 1, this.constantes.explosion.frame do
-        this.images.explosions[i] = love.graphics.newImage("images/explosion_" .. i .. ".png")
-    end
-    -- tirs
-    for i = 1, this.constantes.fire.frame do
-        this.images.fires[i] = love.graphics.newImage("images/shot_" .. i .. ".png")
-    end
-    this.sounds.shots[1] = love.audio.newSource("sounds/shot.wav", "static")
-
-    -- Chargement des modules 
-    table.insert(this.missilesModules, require("missiles/baseMissileModule"))
-    table.insert(this.missilesModules, require("missiles/gunMissileModule"))
-    table.insert(this.missilesModules, require("missiles/rafaleMissileModule"))
-    table.insert(this.missilesModules, require("missiles/reboundMissileModule"))
-    table.insert(this.missilesModules, this.missilesModules[2])
-    table.insert(this.missilesModules, this.missilesModules[3])
-    table.insert(this.missilesModules, this.missilesModules[4])
-end
+-- Chargement des modules 
+table.insert(this.missilesModules, require("missiles/baseMissileModule"))
+table.insert(this.missilesModules, require("missiles/gunMissileModule"))
+table.insert(this.missilesModules, require("missiles/rafaleMissileModule"))
+table.insert(this.missilesModules, require("missiles/reboundMissileModule"))
+table.insert(this.missilesModules, this.missilesModules[2])
+table.insert(this.missilesModules, this.missilesModules[3])
+table.insert(this.missilesModules, this.missilesModules[4])
 
 -- Factory à missiles
 function this.create(myTank, myMissileMode)
@@ -81,7 +37,7 @@ function this.createNewMissile(myMissileMode, myTank)
     myMissile.exploded = false
     myMissile.explosionTimeLife = 0
     myMissile.outDated = false
-    myMissile.hitBox = modules.hitbox.create(modules.hitbox.constantes.circleType)
+    myMissile.hitBox = game.hitbox.create(game.hitbox.constantes.circleType)
     myMissile.hitBox.x = myMissile.x
     myMissile.hitBox.y = myMissile.y
     myMissile.ExplosionSoundStarted = false   
@@ -90,7 +46,7 @@ function this.createNewMissile(myMissileMode, myTank)
     myMissile.fireImages = {}
     myMissile.explosionImageIndex = 0
     myMissile.explosionDamageDone = false
-    myMissile.explosionHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
+    myMissile.explosionHitbox = game.hitbox.create(game.hitbox.constantes.circleType)
     return myMissile
 end
 
@@ -106,11 +62,9 @@ end
 
 function this.updateExplosionSound(dt, myMissile)
     -- Son d'explosion du missile si pas encore fait
-    if this.sounds.explosions[1]:isPlaying() then
-        this.sounds.explosions[1]:stop()
-    end
-    this.sounds.explosions[1]:setPitch(myMissile.octave)
-    this.sounds.explosions[1]:play()
+    game.sounds.explosion:stop()
+    game.sounds.explosion:setPitch(myMissile.octave)
+    game.sounds.explosion:play()
     myMissile.ExplosionSoundStarted = true
 end
 
@@ -162,9 +116,9 @@ end
 
 function this.updateFireSound(myMissile)
     -- Son d'explosion du missile si pas encore fait
-    this.sounds.shots[1]:stop()
-    this.sounds.shots[1]:setPitch(myMissile.octave)
-    this.sounds.shots[1]:play()
+    game.sounds.shot:stop()
+    game.sounds.shot:setPitch(myMissile.octave)
+    game.sounds.shot:play()
     myMissile.fireSoundStarted = true
 end
 
@@ -195,15 +149,15 @@ function this.updateExplosion(dt, myMissile)
     end
 
     -- On avance dans l'animation de l'explosion du missile
-    myMissile.explosionTimeLife = myMissile.explosionTimeLife + this.constantes.explosion.speed * dt
+    myMissile.explosionTimeLife = myMissile.explosionTimeLife + game.constantes.explosion.speed * dt
 
     -- Est-ce que le missile doit disparaitre (animation d'explosion terminée)
     myMissile.explosionImageIndex = math.floor(myMissile.explosionTimeLife) + 1
-    if myMissile.explosionImageIndex > #this.images.explosions then
+    if myMissile.explosionImageIndex > #game.images.explosions then
         myMissile.outDated = true
     else
-        if myMissile.hitBox.type ~= modules.hitbox.constantes.noneType then
-            myMissile.explosionImage = this.images.explosions[myMissile.explosionImageIndex]
+        if myMissile.hitBox.type ~= game.hitbox.constantes.noneType then
+            myMissile.explosionImage = game.images.explosions[myMissile.explosionImageIndex]
         end
     end
 end
@@ -233,8 +187,8 @@ function this.drawExplosion(myMissile)
     if myMissile.explosionImage ~= nil then
         love.graphics.draw(
             myMissile.explosionImage, 
-            math.floor(myMissile.hitBox.x + modules.game.offset.x), 
-            math.floor(myMissile.hitBox.y + modules.game.offset.y), 
+            math.floor(myMissile.hitBox.x + game.offset.x), 
+            math.floor(myMissile.hitBox.y + game.offset.y), 
             myMissile.angle, 
             myMissile.explosionZoom, 
             myMissile.explosionZoom, 
@@ -245,11 +199,11 @@ end
 
 function this.drawActiveMissile(myMissile)
     -- Affichage du missile proprement dit
-    if myMissile.hitBox.type ~= modules.hitbox.constantes.noneType then
+    if myMissile.hitBox.type ~= game.hitbox.constantes.noneType then
         love.graphics.draw(
             myMissile.image, 
-            math.floor(myMissile.x + modules.game.offset.x), 
-            math.floor(myMissile.y + modules.game.offset.y), 
+            math.floor(myMissile.x + game.offset.x), 
+            math.floor(myMissile.y + game.offset.y), 
             myMissile.angle,
             1,
             1,
@@ -262,8 +216,8 @@ function this.drawFire(myMissile)
     if myMissile.fireImage ~= nil then
         love.graphics.draw(
             myMissile.fireImage, 
-            math.floor(myMissile.tank.turret.output.x + modules.game.offset.x), 
-            math.floor(myMissile.tank.turret.output.y + modules.game.offset.y), 
+            math.floor(myMissile.tank.turret.output.x + game.offset.x), 
+            math.floor(myMissile.tank.turret.output.y + game.offset.y), 
             myMissile.angle, 
             myMissile.fireZoom, 
             myMissile.fireZoom, 

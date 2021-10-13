@@ -9,59 +9,34 @@ io.stdout:setvbuf("no")
 -- Désactive le lissage en cas de scale
 love.graphics.setDefaultFilter("nearest")
 
-math.randomseed(love.timer.getTime())
-
--- Les modules seront disponibles partout
-modules = {}
-
-function loadModules()
-    modules.tweening = require("modules/tweeningModule")
-    
-    modules.game = require("modules/gameModule")
-    modules.game.load()
-
-    modules.tank = require("tanks/tankModule")
-    modules.tank.load()
-    
-    modules.obstacle = require("modules/obstacleModule")
-    modules.obstacle.load()
-    
-    modules.hitbox = require("modules/hitboxModule")
-    modules.hitbox.load()
-
-    modules.missile = require("missiles/missileModule")
-    modules.missile.load()
-
-    modules.turret = require("turrets/turretModule")
-    modules.turret.load()
-end
+-- Variable contenu les données du jeu
+game = require("modules/gameModule")
 
 function love.load()
     -- Changement du mode d'affichage
-    love.window.setMode (1027, 768, { resizable = false, vsync = true, centered = true})
+    love.window.setMode (1024, 768, { resizable = false, vsync = true, centered = true})
     love.window.setTitle("Tank battleground")
+    math.randomseed(love.timer.getTime())
 
-    -- Chargement des modules
-    loadModules()
+    -- Chargement des ressources du jeu
+    game.load()
 
     -- Chargement du menu principal    
-    local mainMenu = require("maps/mainTitleModule")
-    mainMenu.load()    
-    modules.game.init(mainMenu)
+    game.init(require("maps/mainTitleModule"))
 end
 
 function love.update(dt)
-    modules.game.update(dt)        
+    game.update(dt)        
 end
 
 function love.draw()
-    modules.game.draw()
+    game.draw()
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-    modules.game.mousepressed(x, y, button, istouch, presses)   
+    game.mousepressed(x, y, button, istouch, presses)   
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    modules.game.keypressed(key, scancode, isrepeat)  
+    game.keypressed(key, scancode, isrepeat)  
 end

@@ -16,18 +16,76 @@ this.constantes.modes.initGameEnd = 10
 this.constantes.modes.gameEnd = 11
 this.constantes.modes.ttl = 0.5
 this.constantes.modes.messageTtl = 2
+
+-- Tank
+this.constantes.tank = {}
+this.constantes.tank.skins = {}
+this.constantes.tank.skins.number = {}
+this.constantes.tank.skins.number.player = 3
+this.constantes.tank.skins.number.ennemy = 3
+this.constantes.tank.skins.number.total = 6
+this.constantes.tank.skins.playerRed = 2
+this.constantes.tank.skins.playerBlue = 3
+this.constantes.tank.skins.playerGreen = 4
+this.constantes.tank.skins.ennemySmall = 5
+this.constantes.tank.skins.ennemyMedium = 6
+this.constantes.tank.skins.ennemyLarge = 7
+this.constantes.tank.modes = {}
+this.constantes.tank.modes.player = 1
+this.constantes.tank.modes.ennemy = 2
+
+-- tourelle
+this.constantes.turret = {}
+this.constantes.turret.offset = {}
+this.constantes.turret.offset.x = 8
+this.constantes.turret.offset.y = 0
+this.constantes.turret.skins = {}
+this.constantes.turret.skins.count = 6
+this.constantes.turret.emotes = {}
+this.constantes.turret.emotes.count = 3
+this.constantes.turret.flames = {}
+this.constantes.turret.flames.count = 5
+this.constantes.turret.flames.speed = 15
+
+-- Obstacles
+this.constantes.obstacle = {}
+this.constantes.obstacle.nbObstacleResource = 12
+
+-- Explosion
+this.constantes.explosion = {}
+this.constantes.explosion.speed = 12
+this.constantes.explosion.frame = 5
+
+-- Missiles
+this.constantes.missile = {}
+this.constantes.missile.frame = 3
+this.constantes.missile.fire = {}
+this.constantes.missile.fire.frame = 4
+
+-- Stockage des ressources
 this.images = {}
+this.images.tanks = {}
+this.images.turrets = {}
+this.images.missiles = {}
+this.images.flames = {}
+this.images.emotes = {}
+this.images.explosions = {}
+this.images.fires = {}
+this.images.obstacles = {}
 this.sounds = {}
 this.musics = {}
 this.fonts = {}
+
 this.fonts.size = {}
 this.fonts.size.tiny = 9
 this.fonts.size.small = 18
 this.fonts.size.medium = 36
 this.fonts.size.large = 72
 this.fonts.size.giant = 108
+
 this.pauseState = false
 
+-- Directions proposées par les tuiles
 this.tileBeacons = 
 {
     { 1, { 3, 4 } },
@@ -52,6 +110,7 @@ this.tileBeacons =
     { 38, { 1, 3, 4 } },
 }
 
+-- Modificateur de mouvement des tuiles
 this.tileModifiers = 
 {
     { 13, 95 / 100 },
@@ -86,38 +145,98 @@ this.tileModifiers =
 
 function this.load()
     -- Chargement des ressources
+    -- Images
+    -- Tuiles
     this.images.tiles = {}
     for i = 1, this.constantes.tilesNumber do
         this.images.tiles[i] = love.graphics.newImage("images/tiles/" .. i .. ".png")
     end
+
+    -- Médailles
     this.images.medals = {}
     for i = 1, 3 do
         this.images.medals[i] = love.graphics.newImage("images/medal_" .. i .. ".png")
     end
+
+    -- Tanks
+    for i = 1, this.constantes.tank.skins.number.total do
+        this.images.tanks[i] = love.graphics.newImage("images/tank_" .. i .. ".png")
+    end
+    this.images.tanks.trace = love.graphics.newImage("images/trace.png")
+
+    -- Tourelles
+    for i = 1, this.constantes.turret.skins.count do
+        this.images.turrets[i] = love.graphics.newImage("images/turret_" .. i .. ".png")
+    end 
+    for i = 1, this.constantes.turret.flames.count do
+        this.images.flames[i] = love.graphics.newImage("images/flame_" .. i .. ".png")
+    end  
+    for i = 1, this.constantes.turret.emotes.count do
+        this.images.emotes[i] = love.graphics.newImage("images/emote_" .. i .. ".png")
+    end  
+
+   -- Missiles
+   for i = 1, this.constantes.missile.frame do
+       this.images.missiles[i] = love.graphics.newImage("images/missile_" .. i .. ".png")
+   end
+
+   -- Explosion
+   for i = 1, this.constantes.explosion.frame do
+       this.images.explosions[i] = love.graphics.newImage("images/explosion_" .. i .. ".png")
+   end
+
+   -- tirs
+   for i = 1, this.constantes.missile.fire.frame do
+       this.images.fires[i] = love.graphics.newImage("images/shot_" .. i .. ".png")
+   end
+
+    -- Obstacles
+    for i = 1, game.constantes.obstacle.nbObstacleResource do
+        this.images.obstacles[i] = love.graphics.newImage("images/obstacle_" .. i .. ".png")
+    end
+
+    -- Images diverses
     this.images.background = love.graphics.newImage("images/Background.png")
     this.images.bandeau = love.graphics.newImage("images/bandeau.png")
     this.images.bonus = love.graphics.newImage("images/bonus_1.png")
     this.images.cross = love.graphics.newImage("images/cross.png")
     this.images.cursor = love.mouse.newCursor("images/crosshair.png", 0, 0)
+
+    -- Fonts
     this.fonts.tiny = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.tiny)
     this.fonts.small = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.small)
     this.fonts.medium = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.medium)
     this.fonts.large = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.large)
     this.fonts.giant = love.graphics.newFont("fonts/KenFutureNarrow.ttf", this.fonts.size.giant)
+
+    -- Effets sonores
     this.sounds.validation = love.audio.newSource("sounds/confirmation_001.ogg", "static")
     this.sounds.switch = love.audio.newSource("sounds/switch28.ogg", "static")
+    this.sounds.alert = love.audio.newSource("sounds/tindeck.mp3", "static")
+    this.sounds.explosion  = love.audio.newSource("sounds/explosion.mp3", "static")
+    this.sounds.shot = love.audio.newSource("sounds/shot.wav", "static")
+
+    -- Musiques
     this.musics.menu = love.audio.newSource("musics/bensound-epic.mp3", "stream")
     this.musics.map1 = love.audio.newSource("musics/bensound-evolution.mp3", "stream")
     this.musics.map2 = love.audio.newSource("musics/bensound-theduel.mp3", "stream")
     this.musics.win = love.audio.newSource("musics/bensound-brazilsamba.mp3", "stream")
     this.musics.loose = love.audio.newSource("musics/bensound-creepy.mp3", "stream")
+
+    -- modules
+    this.tweening = require("modules/tweeningModule")
+    this.tank = require("tanks/tankModule")
+    this.obstacle = require("modules/obstacleModule")
+    this.hitbox = require("modules/hitboxModule")
+    this.missile = require("missiles/missileModule")
+    this.turret = require("turrets/turretModule")
 end
 
 function this.init(myMap)
-    modules.missile.missiles = {}
-    modules.tank.tanks = {}
-    modules.turret.turrets = {}
-    modules.obstacle.obstacles = {}
+    this.missile.missiles = {}
+    this.tank.tanks = {}
+    this.turret.turrets = {}
+    this.obstacle.obstacles = {}
     this.map = myMap
     this.map.init()
 
@@ -144,7 +263,7 @@ function this.init(myMap)
             -- Regarde si la tuile courante doit contenir une balises
             if tileBeacon[tile] ~= nil then
                 -- On ajoute la balise
-                local newBeacon = modules.hitbox.create(modules.hitbox.constantes.circleType)
+                local newBeacon = this.hitbox.create(this.hitbox.constantes.circleType)
                 newBeacon.id = i
                 newBeacon.x = math.floor((0.5 + (i - 1) % this.map.constantes.tiles.number.x) * this.map.constantes.tiles.size.x)
                 newBeacon.y = math.floor((0.5 + math.floor((i - 1) / this.map.constantes.tiles.number.x)) * this.map.constantes.tiles.size.y)
@@ -160,8 +279,8 @@ function this.init(myMap)
         this.map.additionalDecors = {}
         for i, myObstacle in ipairs(this.map.obstacles) do
             table.insert(
-                modules.obstacle.obstacles, 
-                modules.obstacle.create(
+                this.obstacle.obstacles, 
+                this.obstacle.create(
                     myObstacle[1], 
                     myObstacle[2], 
                     myObstacle[3], 
@@ -185,7 +304,7 @@ function this.init(myMap)
                         if myObstacle[13][1] ~= nil and myObstacle[13][2] ~= nil then
                             table.insert(
                                 this.map.additionalDecors, 
-                                modules.obstacle.create(
+                                this.obstacle.create(
                                     love.math.random(myObstacle[13][1], myObstacle[13][2]), 
                                     j + 12, 
                                     k + 12, 
@@ -214,18 +333,18 @@ function this.init(myMap)
         -- Calcul de la position à partir de la tuile
         tankX = (this.map.start[1] - 0.5) * this.map.constantes.tiles.size.x
         tankY = (this.map.start[2] - 0.5) * this.map.constantes.tiles.size.y
-        this.playerTank = modules.tank.create(modules.tank.constantes.modes.player, this.map.playerSkin, tankX, tankY, this.map.start[3])
-        table.insert(modules.tank.tanks, this.playerTank)
-        table.insert(modules.turret.turrets, this.playerTank.turret)
+        this.playerTank = this.tank.create(this.constantes.tank.modes.player, this.map.playerSkin, tankX, tankY, this.map.start[3])
+        table.insert(this.tank.tanks, this.playerTank)
+        table.insert(this.turret.turrets, this.playerTank.turret)
     end
     -- Ennemis
     for i, ennemy in ipairs(this.map.ennemis) do
         tankX = (ennemy[2] - 0.5) * this.map.constantes.tiles.size.x
         tankY = (ennemy[3] - 0.5) * this.map.constantes.tiles.size.y
-        local ennemyTank = modules.tank.create(modules.tank.constantes.modes.ennemy, ennemy[1], tankX, tankY, ennemy[4])
+        local ennemyTank = this.tank.create(this.constantes.tank.modes.ennemy, ennemy[1], tankX, tankY, ennemy[4])
         ennemyTank.enemy = this.playerTank
-        table.insert(modules.tank.tanks, ennemyTank)
-        table.insert(modules.turret.turrets, ennemyTank.turret)
+        table.insert(this.tank.tanks, ennemyTank)
+        table.insert(this.turret.turrets, ennemyTank.turret)
     end
 
     love.mouse.setCursor(this.images.cursor)
@@ -271,8 +390,8 @@ function this.updateCamera(dt)
         if this.fireShake == true then
             this.fireShakeTtl = this.fireShakeTtl - dt
             if this.fireShakeTtl >= 0 then
-                this.offset.x = this.offset.x + this.amplitudeShake * math.cos(this.playerTank.turret.angle + math.pi) * modules.tweening.easingInOutBack(this.fireShakeTtl / this.fireShakeMaxTtl)
-                this.offset.y = this.offset.y + this.amplitudeShake * math.sin(this.playerTank.turret.angle + math.pi) * modules.tweening.easingInOutBack(this.fireShakeTtl / this.fireShakeMaxTtl)
+                this.offset.x = this.offset.x + this.amplitudeShake * math.cos(this.playerTank.turret.angle + math.pi) * this.tweening.easingInOutBack(this.fireShakeTtl / this.fireShakeMaxTtl)
+                this.offset.y = this.offset.y + this.amplitudeShake * math.sin(this.playerTank.turret.angle + math.pi) * this.tweening.easingInOutBack(this.fireShakeTtl / this.fireShakeMaxTtl)
             else
                 this.fireShake = false
                 this.fireShakeTtl = this.fireShakeMaxTtl
@@ -360,7 +479,7 @@ function this.update(dt)
         if this.initialTtl > this.constantes.modes.ttl then
             this.initialTtl = 0
             this.mode = this.constantes.modes.gameEnd
-            modules.game.sounds.validation:play()
+            this.sounds.validation:play()
             this.map.music:stop()
         end
     elseif this.mode == this.constantes.modes.gameEnd then
@@ -378,19 +497,19 @@ function this.update(dt)
             this.map.update(dt, mouse)
     
             -- Gestion des collisions
-            modules.obstacle.ManageCollision()
+            this.obstacle.ManageCollision()
     
             -- On met à jour les obstacles
-            modules.obstacle.update(dt)
+            this.obstacle.update(dt)
     
             -- On met à jour les tanks
-            modules.tank.update(dt)
+            this.tank.update(dt)
      
             -- On met à jour les tourelles
-            modules.turret.update(dt, mouse)
+            this.turret.update(dt, mouse)
     
             -- On update les missiles
-            modules.missile.update(dt)
+            this.missile.update(dt)
         end
     end
 end
@@ -421,7 +540,7 @@ function this.drawGameEnd(myAlpha)
     local font = love.graphics.getFont()
     love.graphics.print(actionsLabel, (love.graphics.getWidth() - font:getWidth(actionsLabel)) / 2, 6 * (love.graphics.getHeight() - font:getHeight(actionsLabel)) / 7)
     
-    local image = modules.game.images.medals[this.map.number ]
+    local image = game.images.medals[this.map.number ]
 
     love.graphics.draw(
         image,
@@ -500,20 +619,20 @@ function this.draw()
     end
 
     -- On draw les obstacles
-    modules.obstacle.draw()
+    this.obstacle.draw()
 
     -- On draw les tanks
-    modules.tank.draw()
+    this.tank.draw()
     
     -- On draw les tourelles
-    modules.turret.draw()    
+    this.turret.draw()    
 
     -- On draw les missiles
-    modules.missile.draw()
+    this.missile.draw()
 
     -- On draw les décors additionnels
     for i, myDecor in ipairs(this.map.additionalDecors) do
-        modules.obstacle.drawObstacle(myDecor)
+        this.obstacle.drawObstacle(myDecor)
     end
 
     this.map.draw()
@@ -529,7 +648,7 @@ function this.draw()
         
     elseif this.mode == this.constantes.modes.initpause then
         -- Filtre transparent
-        love.graphics.setColor(255, 255, 255, modules.tweening.easingLin(this.initialTtl / this.constantes.modes.ttl) * 0.75)
+        love.graphics.setColor(255, 255, 255, this.tweening.easingLin(this.initialTtl / this.constantes.modes.ttl) * 0.75)
         love.graphics.draw(this.images.background, 0, 0)
 
         -- Libellé
@@ -538,7 +657,7 @@ function this.draw()
             
     elseif this.mode == this.constantes.modes.quitpause then
         -- Filtre transparent
-        love.graphics.setColor(255, 255, 255, modules.tweening.easingLin((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl) * 0.75)
+        love.graphics.setColor(255, 255, 255, this.tweening.easingLin((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl) * 0.75)
         love.graphics.draw(this.images.background, 0, 0)
 
         -- Libellé
@@ -547,7 +666,7 @@ function this.draw()
 
     elseif this.mode == this.constantes.modes.initMessage then
         -- Filtre transparent
-        love.graphics.setColor(255, 255, 255, modules.tweening.easingLin(this.initialTtl / this.constantes.modes.ttl) * 0.75)
+        love.graphics.setColor(255, 255, 255, this.tweening.easingLin(this.initialTtl / this.constantes.modes.ttl) * 0.75)
         love.graphics.draw(this.images.bandeau, 0, (love.graphics.getHeight() - this.images.bandeau:getHeight()) / 2)
 
         -- Libellé
@@ -565,7 +684,7 @@ function this.draw()
             
     elseif this.mode == this.constantes.modes.quitMessage then
         -- Filtre transparent
-        love.graphics.setColor(255, 255, 255, modules.tweening.easingLin((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl) * 0.75)
+        love.graphics.setColor(255, 255, 255, this.tweening.easingLin((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl) * 0.75)
         love.graphics.draw(this.images.bandeau, 0, (love.graphics.getHeight() - this.images.bandeau:getHeight()) / 2)
 
         -- Libellé
@@ -573,18 +692,18 @@ function this.draw()
         love.graphics.setColor(255, 255, 255)
 
     elseif this.mode == this.constantes.modes.initGameEnd then
-        this.drawGameEnd(modules.tweening.easingLin(this.initialTtl / this.constantes.modes.ttl) * 0.75)
+        this.drawGameEnd(this.tweening.easingLin(this.initialTtl / this.constantes.modes.ttl) * 0.75)
         
     elseif this.mode == this.constantes.modes.gameEnd then
         this.drawGameEnd(0.75)
 
     elseif this.mode == this.constantes.modes.init then
-        love.graphics.setColor(0, 0, 0, modules.tweening.easingLin((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl))
+        love.graphics.setColor(0, 0, 0, this.tweening.easingLin((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl))
         love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
         love.graphics.setColor(255, 255, 255)
 
     elseif this.mode == this.constantes.modes.quit then
-        love.graphics.setColor(0, 0, 0, modules.tweening.easingLin(this.initialTtl / this.constantes.modes.ttl))
+        love.graphics.setColor(0, 0, 0, this.tweening.easingLin(this.initialTtl / this.constantes.modes.ttl))
         love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
         love.graphics.setColor(255, 255, 255)
     end
