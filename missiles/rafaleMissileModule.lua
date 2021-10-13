@@ -5,7 +5,7 @@ this.constantes = {}
 -- Tir en rafale
 this.constantes.mode = 3
 this.constantes.minScope = 50
-this.constantes.maxScope = 350
+this.constantes.maxScope = 250
 this.constantes.intervalScope = 25
 this.constantes.reload = 1
 this.constantes.explosionZoom = 1.5
@@ -23,6 +23,10 @@ this.constantes.childMaxScope = 120
 this.constantes.damage = {}
 this.constantes.damage.missile = 150
 this.constantes.damage.explosion = 75
+this.constantes.childDamage = 75
+this.constantes.shake = {}
+this.constantes.shake.amplitude = 20
+this.constantes.shake.time = 0.2
 
 -- Factory à missiles
 function this.create(myTank)
@@ -62,6 +66,8 @@ function this.init(myMissile)
     myMissile.damage.missile = this.constantes.damage.missile
     myMissile.damage.explosion = this.constantes.damage.explosion
     myMissile.explosionHitbox.radius = this.constantes.explosionZoom * modules.missile.images.missiles[1]:getWidth()
+    myMissile.amplitudeShake = this.constantes.shake.amplitude
+    myMissile.timeShake = this.constantes.shake.time
     table.insert(modules.missile.missiles, myMissile)
 end
 
@@ -77,6 +83,8 @@ function this.createChild(myMissile, index)
     newMissile.initialy = myMissile.y
     newMissile.hitBox.x = newMissile.initialx
     newMissile.hitBox.y = newMissile.initialy
+    newMissile.damage.missile = this.constantes.childDamage
+    newMissile .damage.explosion = this.constantes.childDamage / 2
     modules.missile.updateFireSound(newMissile)
 
     -- Ajout à la collection de missiles

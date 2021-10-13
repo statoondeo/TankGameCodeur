@@ -11,12 +11,13 @@ this.constantes.skins.count = 6
 this.constantes.emotes = {}
 this.constantes.emotes.count = 3
 this.constantes.flames = {}
-this.constantes.flames.count = 2
-this.constantes.flames.speed = 10
+this.constantes.flames.count = 5
+this.constantes.flames.speed = 15
 this.images = {}
 this.images.turrets = {}
 this.images.flames = {}
 this.images.emotes = {}
+this.sounds = {}
 
 this.turrets = {}
 this.turretsmodules = {}
@@ -32,6 +33,7 @@ function this.load()
     for i = 1, this.constantes.emotes.count do
         this.images.emotes[i] = love.graphics.newImage("images/emote_" .. i .. ".png")
     end  
+    this.sounds.alert = love.audio.newSource("sounds/tindeck.mp3", "static")
 
     -- Chargement des modules
     table.insert(this.turretsmodules, require("turrets/allyTurretModule"))
@@ -67,8 +69,9 @@ function this.createNew(myTurretSkin, myTank)
     newTurret.fireImages = {}
     newTurret.fireImages[1] = this.images.flames[1]
     newTurret.fireImages[2] = this.images.flames[2]
-    newTurret.fireImages[3] = this.images.flames[2]
-    newTurret.fireImages[4] = this.images.flames[1]
+    newTurret.fireImages[3] = this.images.flames[3]
+    newTurret.fireImages[4] = this.images.flames[4]
+    newTurret.fireImages[5] = this.images.flames[5]
     return newTurret
 end
 
@@ -113,24 +116,24 @@ function this.drawTurret(myTurret)
         -- Affichage de la flamme
         love.graphics.draw(
             myTurret.fireImage, 
-            myTurret.x + modules.game.offset.x, 
-            myTurret.y +  modules.game.offset.y,
+            math.floor(myTurret.x + modules.game.offset.x), 
+            math.floor(myTurret.y +  modules.game.offset.y),
             0, 
             sens, 
             1, 
-            myTurret.fireImage:getWidth() / 2, 
-            myTurret.fireImage:getHeight() / 2)
+            math.floor(myTurret.fireImage:getWidth() / 2), 
+            math.floor(myTurret.fireImage:getHeight()))
     else
         -- Affichage de la tourelle
         love.graphics.draw(
             myTurret.image, 
-            myTurret.x + modules.game.offset.x, 
-            myTurret.y +  modules.game.offset.y,
+            math.floor(myTurret.x + modules.game.offset.x), 
+            math.floor(myTurret.y +  modules.game.offset.y),
             myTurret.angle, 
             1, 
             1, 
-            myTurret.center.x, 
-            myTurret.center.y)
+            math.floor(myTurret.center.x), 
+            math.floor(myTurret.center.y))
     end
     myTurret.module.drawTurret(myTurret)
 end

@@ -4,10 +4,10 @@ this.constantes = {}
 
 -- Tir explosif
 this.constantes.mode = 4
-this.constantes.scope = 450
+this.constantes.scope = 275
 this.constantes.number = 16
 this.constantes.reload = 1.5
-this.constantes.minScope = 50
+this.constantes.minScope = 25
 this.constantes.maxScope = 150
 this.constantes.explosionZoom = 2
 this.constantes.ttl = 2
@@ -16,9 +16,13 @@ this.constantes.fire = {}
 this.constantes.fire.speed = 25
 this.constantes.fire.zoom = 1.8
 this.constantes.childMode = 1
+this.constantes.childDamage = 50
 this.constantes.damage = {}
 this.constantes.damage.missile = 200
 this.constantes.damage.explosion = 100
+this.constantes.shake = {}
+this.constantes.shake.amplitude = 25
+this.constantes.shake.time = 0.25
 
 -- Factory à missiles
 function this.create(myTank)
@@ -63,6 +67,8 @@ function this.init(myMissile)
     myMissile.damage.missile = this.constantes.damage.missile
     myMissile.damage.explosion = this.constantes.damage.explosion
     myMissile.explosionHitbox.radius = this.constantes.explosionZoom * modules.missile.images.missiles[1]:getWidth()
+    myMissile.amplitudeShake = this.constantes.shake.amplitude
+    myMissile.timeShake = this.constantes.shake.time
     table.insert(modules.missile.missiles, myMissile)
 end
 
@@ -78,6 +84,8 @@ function this.createChild(myMissile, index)
     newMissile.initialy = myMissile.y
     newMissile.hitBox.x = newMissile.initialx
     newMissile.hitBox.y = newMissile.initialy
+    myMissile.damage.missile = this.constantes.childDamage
+    myMissile.damage.explosion = this.constantes.childDamage / 2
 
     table.insert(modules.missile.missiles, newMissile)
 end
@@ -96,13 +104,13 @@ end
 function this.draw(myMissile)
     love.graphics.draw(
         myMissile.rocketImage, 
-        myMissile.x + modules.game.offset.x, 
-        myMissile.y + modules.game.offset.y, 
+        math.floor(myMissile.x + modules.game.offset.x), 
+        math.floor(myMissile.y + modules.game.offset.y), 
         myMissile.angle, 
         -1, 
         1, 
         0, 
-        myMissile.rocketImage:getHeight() / 2)
+        math.floor(myMissile.rocketImage:getHeight() / 2))
 end
 
 return this

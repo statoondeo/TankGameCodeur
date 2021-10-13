@@ -52,6 +52,38 @@ this.tileBeacons =
     { 38, { 1, 3, 4 } },
 }
 
+this.tileModifiers = 
+{
+    { 13, 95 / 100 },
+    { 14, 95 / 100 },
+    { 15, 95 / 100 },
+    { 16, 95 / 100 },
+    { 17, 95 / 100 },
+    { 18, 95 / 100 },
+    { 19, 95 / 100 },
+    { 20, 95 / 100 },
+    { 21, 85 / 100 },
+    { 22, 85 / 100 },
+    { 23, 85 / 100 },
+    { 24, 85 / 100 },
+    { 25, 90 / 100 },
+    { 26, 90 / 100 },
+    { 27, 95 / 100 },
+    { 28, 95 / 100 },
+    { 29, 95 / 100 },
+    { 30, 95 / 100 },
+    { 31, 95 / 100 },
+    { 32, 95 / 100 },
+    { 33, 95 / 100 },
+    { 34, 95 / 100 },
+    { 35, 95 / 100 },
+    { 36, 95 / 100 },
+    { 37, 95 / 100 },
+    { 38, 95 / 100 },
+    { 39, 80 / 100 },
+    { 40, 80 / 100 },
+}
+
 function this.load()
     -- Chargement des ressources
     this.images.tiles = {}
@@ -97,83 +129,100 @@ function this.init(myMap)
         tileBeacon[beacon[1]] = beacon[2]
     end
 
-    -- On parcour la map
-    this.map.beacons = {}
-    for i, tile in ipairs(this.map.tiles) do
-        -- Regarde si la tuile courante doit contenir une balises
-        if tileBeacon[tile] ~= nil then
-            -- On ajoute la balise
-            local newBeacon = {}
-            newBeacon[1] = i                -- Beacon id
-            -- Beacon x
-            newBeacon[2] = (0.5 + (i - 1) % this.map.constantes.tiles.number.x) * this.map.constantes.tiles.size.x
-            -- Beacon y
-            newBeacon[3] = (0.5 + math.floor((i - 1) / this.map.constantes.tiles.number.x)) * this.map.constantes.tiles.size.y
-            newBeacon[4] = 3                -- Beacon radius
-            newBeacon[5] = tileBeacon[tile] -- Beacon directions
-            table.insert(this.map.beacons, newBeacon)
-        end
-    end    
+    -- Construction du tableau de correspondance tuile/direction
+    if this.map.modifiers == nil then
+        this.map.modifiers = {}
+        for i, modifier in ipairs(this.tileModifiers) do
+            this.map.modifiers[modifier[1]] = modifier[2]
+        end       
+    end
 
-    -- On ajoute les obstacles de la map à la collection du niveau en cours
-    this.additionalDecors = {}
-    for i, myObstacle in ipairs(this.map.obstacles) do
-        table.insert(
-            modules.obstacle.obstacles, 
-            modules.obstacle.create(
-                myObstacle[1], 
-                myObstacle[2], 
-                myObstacle[3], 
-                myObstacle[4], 
-                myObstacle[5], 
-                myObstacle[6], 
-                myObstacle[7],
-                myObstacle[8],
-                myObstacle[9],
-                myObstacle[10],
-                myObstacle[11],
-                myObstacle[12]))
-
-        -- Remplissage des zones à peupler avec des décorations
-        if myObstacle[1] == 0 then
-            -- On remplit chaque zone demandée
-            local j = myObstacle[2]
-            while j < myObstacle[2] + myObstacle[11] do
-                local k = myObstacle[3]
-                while k < myObstacle[3] + myObstacle[12] do
-                    if myObstacle[13][1] ~= nil and myObstacle[13][2] ~= nil then
-                        table.insert(
-                            this.additionalDecors, 
-                            modules.obstacle.create(
-                                love.math.random(myObstacle[13][1], myObstacle[13][2]), 
-                                j + 12, 
-                                k + 12, 
-                                love.math.random() * math.pi, 
-                                love.math.random() * 0.8 + 0.4, 
-                                false, 
-                                false,
-                                1,
-                                nil,
-                                0,
-                                0,
-                                0))
-                    end
-                    k = k + 25
-                end
-                j = j + 25
+    if this.map.beacons == nil then
+        -- On parcour la map
+        this.map.beacons = {}
+        for i, tile in ipairs(this.map.tiles) do
+            -- Regarde si la tuile courante doit contenir une balises
+            if tileBeacon[tile] ~= nil then
+                -- On ajoute la balise
+                local newBeacon = modules.hitbox.create(modules.hitbox.constantes.circleType)
+                newBeacon.id = i
+                newBeacon.x = math.floor((0.5 + (i - 1) % this.map.constantes.tiles.number.x) * this.map.constantes.tiles.size.x)
+                newBeacon.y = math.floor((0.5 + math.floor((i - 1) / this.map.constantes.tiles.number.x)) * this.map.constantes.tiles.size.y)
+                newBeacon.radius = 32
+                newBeacon.directions = tileBeacon[tile]
+                table.insert(this.map.beacons, newBeacon)
             end
-        end
+        end         
+    end  
+
+    if this.map.additionalDecors == nil then
+        -- On ajoute les obstacles de la map à la collection du niveau en cours
+        this.map.additionalDecors = {}
+        for i, myObstacle in ipairs(this.map.obstacles) do
+            table.insert(
+                modules.obstacle.obstacles, 
+                modules.obstacle.create(
+                    myObstacle[1], 
+                    myObstacle[2], 
+                    myObstacle[3], 
+                    myObstacle[4], 
+                    myObstacle[5], 
+                    myObstacle[6], 
+                    myObstacle[7],
+                    myObstacle[8],
+                    myObstacle[9],
+                    myObstacle[10],
+                    myObstacle[11],
+                    myObstacle[12]))
+
+            -- Remplissage des zones à peupler avec des décorations
+            if myObstacle[1] == 0 then
+                -- On remplit chaque zone demandée
+                local j = myObstacle[2]
+                while j < myObstacle[2] + myObstacle[11] do
+                    local k = myObstacle[3]
+                    while k < myObstacle[3] + myObstacle[12] do
+                        if myObstacle[13][1] ~= nil and myObstacle[13][2] ~= nil then
+                            table.insert(
+                                this.map.additionalDecors, 
+                                modules.obstacle.create(
+                                    love.math.random(myObstacle[13][1], myObstacle[13][2]), 
+                                    j + 12, 
+                                    k + 12, 
+                                    love.math.random() * math.pi, 
+                                    love.math.random() * 0.4 + 0.8, 
+                                    false, 
+                                    false,
+                                    1,
+                                    nil,
+                                    0,
+                                    0,
+                                    0))
+                        end
+                        k = k + love.math.random(16, 48)
+                    end
+                    j = j + love.math.random(16, 48)
+                end
+            end
+        end       
     end
 
     -- Création du tank joueur
+    local tankX
+    local tankY
     if this.map.start ~= nil then
-        this.playerTank = modules.tank.create(modules.tank.constantes.modes.player, this.map.playerSkin, this.map.start[1], this.map.start[2], this.map.start[3])
+        -- Calcul de la position à partir de la tuile
+        tankX = (this.map.start[1] - 0.5) * this.map.constantes.tiles.size.x
+        tankY = (this.map.start[2] - 0.5) * this.map.constantes.tiles.size.y
+        this.playerTank = modules.tank.create(modules.tank.constantes.modes.player, this.map.playerSkin, tankX, tankY, this.map.start[3])
         table.insert(modules.tank.tanks, this.playerTank)
         table.insert(modules.turret.turrets, this.playerTank.turret)
     end
     -- Ennemis
     for i, ennemy in ipairs(this.map.ennemis) do
-        local ennemyTank = modules.tank.create(modules.tank.constantes.modes.ennemy, ennemy[1], ennemy[2], ennemy[3], ennemy[4])
+        tankX = (ennemy[2] - 0.5) * this.map.constantes.tiles.size.x
+        tankY = (ennemy[3] - 0.5) * this.map.constantes.tiles.size.y
+        local ennemyTank = modules.tank.create(modules.tank.constantes.modes.ennemy, ennemy[1], tankX, tankY, ennemy[4])
         ennemyTank.enemy = this.playerTank
         table.insert(modules.tank.tanks, ennemyTank)
         table.insert(modules.turret.turrets, ennemyTank.turret)
@@ -187,6 +236,9 @@ function this.init(myMap)
 
     this.initialTtl = 0
     this.mode = this.constantes.modes.init
+    this.fireShake = false
+    this.fireShakeMaxTtl = 0.15
+    this.fireShakeTtl = this.fireShakeMaxTtl
 end
 
 function this.updateCamera(dt)
@@ -214,6 +266,19 @@ function this.updateCamera(dt)
         -- On calcule l'offset à appliquer à tous les éléments 
         this.offset.x = -camera.x
         this.offset.y = -camera.y
+
+        -- Le tank tire on secoue l'écran
+        if this.fireShake == true then
+            this.fireShakeTtl = this.fireShakeTtl - dt
+            if this.fireShakeTtl >= 0 then
+                this.offset.x = this.offset.x + this.amplitudeShake * math.cos(this.playerTank.turret.angle + math.pi) * modules.tweening.easingInOutBack(this.fireShakeTtl / this.fireShakeMaxTtl)
+                this.offset.y = this.offset.y + this.amplitudeShake * math.sin(this.playerTank.turret.angle + math.pi) * modules.tweening.easingInOutBack(this.fireShakeTtl / this.fireShakeMaxTtl)
+            else
+                this.fireShake = false
+                this.fireShakeTtl = this.fireShakeMaxTtl
+            end
+        end
+
     end
 end
 
@@ -243,7 +308,7 @@ function this.update(dt)
         end
     elseif this.mode == this.constantes.modes.initpause then
         this.initialTtl = this.initialTtl + dt
-        this.map.music:setVolume(this.initialTtl / this.constantes.modes.ttl)
+        this.map.music:setVolume((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl * 0.75 + 0.25)
         if this.initialTtl > this.constantes.modes.ttl then
             this.initialTtl = 0
             this.pauseState = true
@@ -251,7 +316,7 @@ function this.update(dt)
         end
     elseif this.mode == this.constantes.modes.quitpause then
         this.initialTtl = this.initialTtl + dt
-        this.map.music:setVolume((this.constantes.modes.ttl - this.initialTtl) / this.constantes.modes.ttl)
+        this.map.music:setVolume(this.initialTtl / this.constantes.modes.ttl * 0.75 + 0.25)
         if this.initialTtl > this.constantes.modes.ttl then
             this.initialTtl = 0
             this.pauseState = false
@@ -433,21 +498,6 @@ function this.draw()
             (i - 1) % this.map.constantes.tiles.number.x * this.map.constantes.tiles.size.x + this.offset.x, 
             math.floor((i - 1) / this.map.constantes.tiles.number.x) * this.map.constantes.tiles.size.y + this.offset.y)
     end
-    
-    -- -- On affiche les balises
-    -- -- love.graphics.setFont(modules.game.fonts.tiny)
-    -- -- for i, myBeacon in ipairs(this.map.beacons) do
-    -- --     local myBeaconHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
-    -- --     myBeaconHitbox.x = myBeacon[2]
-    -- --     myBeaconHitbox.y = myBeacon[3]
-    -- --     myBeaconHitbox.radius = myBeacon[4]
-
-    -- --     love.graphics.circle("fill", myBeaconHitbox.x + this.offset.x, myBeaconHitbox.y + this.offset.y, myBeaconHitbox.radius)
-
-    -- --     love.graphics.setColor(0, 0, 0)
-    -- --     love.graphics.print(myBeacon[1], myBeaconHitbox.x + this.offset.x, myBeaconHitbox.y + this.offset.y)
-    -- --     love.graphics.setColor(255, 255, 255)
-    -- -- end
 
     -- On draw les obstacles
     modules.obstacle.draw()
@@ -462,7 +512,7 @@ function this.draw()
     modules.missile.draw()
 
     -- On draw les décors additionnels
-    for i, myDecor in ipairs(this.additionalDecors) do
+    for i, myDecor in ipairs(this.map.additionalDecors) do
         modules.obstacle.drawObstacle(myDecor)
     end
 
@@ -583,7 +633,6 @@ function this.quitApp()
 end
 
 function this.mousepressed(x, y, button, istouch, presses)  
-    print("Mouse=>", x - this.offset.x .."/".. y - this.offset.y)
     this.map.mousepressed(x, y, button, istouch, presses)
 end
 

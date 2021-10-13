@@ -1,21 +1,25 @@
 local this = {}
 
 this.constantes = {}
-this.constantes.detectionRange = 175
+this.constantes.detectionRange = 200
 this.constantes.arcSpeed = 1
 this.constantes.sentinel = {}
 this.constantes.sentinel.mode = 1
 this.constantes.sentinel.minSpeed = -1
 this.constantes.sentinel.maxSpeed = 1
-this.constantes.sentinel.color = { 0, 255, 0 }
+this.constantes.sentinel.color = { 173, 255, 47 }
 this.constantes.alert = {}
 this.constantes.alert.mode = 2
-this.constantes.alert.color = { 255, 69, 0 }
+this.constantes.alert.color = { 255, 165, 0 }
 this.constantes.attack = {}
 this.constantes.attack.mode = 3
-this.constantes.attack.color = { 255, 0, 0 }
+this.constantes.attack.ttl = 5
+this.constantes.attack.color = { 139, 0, 0 }
 this.constantes.dead = {}
 this.constantes.dead.mode = 0
+this.constantes.amplitude = {}
+this.constantes.amplitude.min = math.pi / 12
+this.constantes.amplitude.max = 2 * math.pi / 5
 
 -- Factory à tourelles
 function this.create(myTurretSkin, myTank)
@@ -26,7 +30,7 @@ function this.create(myTurretSkin, myTank)
     newTurret.state = this.constantes.sentinel.mode
     newTurret.angle = 0
     newTurret.stateTtl = 0
-    newTurret.arc.amplitude = math.pi / 3    
+    newTurret.arc.amplitude = this.constantes.amplitude.max    
     newTurret.arc.speed = this.constantes.arcSpeed
     this.initStateData(0, newTurret)
     return newTurret
@@ -60,16 +64,16 @@ function this.initStateData(dt, myTurret)
 end
 
 function this.Damage(myTurret, damages)
-    myTurret.state = this.constantes.alert.mode
+    myTurret.state = this.constantes.attack.mode
 end
 
 function this.actionStateData(dt, myTurret)
     myTurret.arc.amplitude = myTurret.arc.amplitude + myTurret.arc.speed * dt
-    if myTurret.arc.amplitude  >= math.pi / 3 then
-        myTurret.arc.amplitude = math.pi / 3
+    if myTurret.arc.amplitude  >= this.constantes.amplitude.max then
+        myTurret.arc.amplitude = this.constantes.amplitude.max
         myTurret.arc.speed = 0
-    elseif myTurret.arc.amplitude  <= math.pi / 12 then
-        myTurret.arc.amplitude = math.pi / 12
+    elseif myTurret.arc.amplitude  <= this.constantes.amplitude.min then
+        myTurret.arc.amplitude = this.constantes.amplitude.min
         myTurret.arc.speed = 0
     end
 
@@ -79,6 +83,9 @@ function this.actionStateData(dt, myTurret)
         -- On check si le tank allié est détecté
         if modules.hitbox.IsCircleInArc(modules.game.playerTank.hitBox, myTurret.arc) == true then
             myTurret.state = this.constantes.alert.mode
+            modules.turret.sounds.alert:stop()
+            modules.turret.sounds.alert:setPitch(1)
+            modules.turret.sounds.alert:play()
             myTurret.arc.speed = -this.constantes.arcSpeed
         end
 
@@ -88,24 +95,36 @@ function this.actionStateData(dt, myTurret)
             myTurret.arc.speed = -this.constantes.arcSpeed
         else
             myTurret.state = this.constantes.sentinel.mode
+            modules.turret.sounds.alert:stop()
+            modules.turret.sounds.alert:setPitch(0.75)
+            modules.turret.sounds.alert:play()
             myTurret.arc.speed = this.constantes.arcSpeed
         end                        
             
-        if myTurret.arc.amplitude  >= math.pi / 3 then
+        if myTurret.arc.amplitude >= this.constantes.amplitude.max then
             myTurret.state = this.constantes.sentinel.mode
-        elseif myTurret.arc.amplitude  <= math.pi / 12 then
+        elseif myTurret.arc.amplitude <= this.constantes.amplitude.min then
             myTurret.state = this.constantes.attack.mode
+            modules.turret.sounds.alert:stop()
+            modules.turret.sounds.alert:setPitch(1.25)
+            modules.turret.sounds.alert:play()
+            myTurret.stateTtl = this.constantes.attack.ttl
         end
 
     elseif myTurret.state == this.constantes.attack.mode then
-        -- On checke si le joueur est toujours ici
-        if modules.hitbox.IsCircleInArc(modules.game.playerTank.hitBox, myTurret.arc) == true then
-            -- La tourelle attaque
-            modules.tank.fire(myTurret.tank)
-        else
-            myTurret.state = this.constantes.alert.mode 
-            myTurret.arc.speed = this.constantes.arcSpeed
-        end            
+        -- La tourelle attaque
+        modules.tank.fire(myTurret.tank)
+
+        myTurret.stateTtl = myTurret.stateTtl - dt
+        if myTurret.stateTtl <= 0 then
+            -- On checke si le joueur est toujours ici
+            if modules.hitbox.IsCircleInArc(modules.game.playerTank.hitBox, myTurret.arc) == true then
+                myTurret.stateTtl = this.constantes.attack.ttl
+            else
+                myTurret.state = this.constantes.alert.mode 
+                myTurret.arc.speed = this.constantes.arcSpeed
+            end            
+        end
 
     elseif myTurret.state == this.constantes.dead.mode then
         -- La tourelle flambe ...
@@ -126,11 +145,25 @@ end
 -- Draw spécifique
 function this.drawTurret(myTurret)
     if myTurret.state ~= this.constantes.dead.mode then
-        love.graphics.setColor(myTurret.arc.color[1], myTurret.arc.color[2], myTurret.arc.color[3], 0.25)
-        love.graphics.arc("fill", myTurret.output.x + modules.game.offset.x, myTurret.output.y + modules.game.offset.y, myTurret.arc.radius, myTurret.angle - myTurret.arc.amplitude, myTurret.angle + myTurret.arc.amplitude)
+        love.graphics.setColor(myTurret.arc.color[1]/255, myTurret.arc.color[2]/255, myTurret.arc.color[3]/255, 0.25)
+        love.graphics.arc(
+            "fill", 
+            math.floor(myTurret.output.x + modules.game.offset.x), 
+            math.floor(myTurret.output.y + modules.game.offset.y), 
+            myTurret.arc.radius, 
+            myTurret.angle - myTurret.arc.amplitude, 
+            myTurret.angle + myTurret.arc.amplitude)
         love.graphics.setColor(255, 255, 255)
 
-        love.graphics.draw(myTurret.emote, myTurret.tank.x + modules.game.offset.x, myTurret.tank.y - 2 * myTurret.tank.center.y + modules.game.offset.y, 0, 1, 1, myTurret.emote:getWidth() / 2, myTurret.emote:getHeight() / 2)
+        love.graphics.draw(
+            myTurret.emote, 
+            math.floor(myTurret.tank.x + modules.game.offset.x), 
+            math.floor(myTurret.tank.y - 2 * myTurret.tank.center.y + modules.game.offset.y), 
+            0, 
+            1, 
+            1, 
+            math.floor(myTurret.emote:getWidth() / 2), 
+            math.floor(myTurret.emote:getHeight() / 2))
     end
 end
 

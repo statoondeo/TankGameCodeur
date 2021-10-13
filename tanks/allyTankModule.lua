@@ -9,11 +9,11 @@ this.constantes.modes.ennemy = 2
 this.constantes.acceleration = 3
 this.constantes.angleAcceleration = 2
 this.constantes.defaultAcceleration = 2
-this.constantes.maxSpeed = 3
+this.constantes.maxSpeed = 2.5
 this.constantes.maxSpeedEnnemy = 1
 this.constantes.tailLife = 1
 this.constantes.tailSpeed = 10
-this.constantes.initialLife = 1000
+this.constantes.initialLife = 1200
 
 -- Factory à tank
 function this.create(myTankMode, myTankSkin, x, y, angle)

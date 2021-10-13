@@ -179,10 +179,12 @@ end
 
 -- Permet de sortir le tank d'un obstacle lors d'une collision
 function this.rewind(myTank)
-    myTank.x = myTank.x - myTank.vector.x
-    myTank.y = myTank.y - myTank.vector.y
-    myTank.hitBox.x = myTank.x
-    myTank.hitBox.y = myTank.y
+    if myTank.outDated == false then
+        myTank.x = myTank.x - myTank.vector.x
+        myTank.y = myTank.y - myTank.vector.y
+        myTank.hitBox.x = myTank.x
+        myTank.hitBox.y = myTank.y
+    end
     return myTank.vector.x ~= 0 or myTank.vector.x ~= 0
     -- return false
 end
@@ -199,13 +201,13 @@ function this.drawtail(myTank, myTail)
     love.graphics.setColor(255, 255, 255, myTail.ttl)
     love.graphics.draw(
         myTank.imageTrace, 
-        myTail.x + modules.game.offset.x, 
-        myTail.y + modules.game.offset.y, 
+        math.floor(myTail.x + modules.game.offset.x), 
+        math.floor(myTail.y + modules.game.offset.y), 
         myTail.angle, 
         1, 
         1, 
-        myTank.imageTrace:getWidth() / 2, 
-        myTank.imageTrace:getHeight() / 2)
+        math.floor(myTank.imageTrace:getWidth() / 2), 
+        math.floor(myTank.imageTrace:getHeight() / 2))
 end
 
 function this.draw() 
@@ -221,21 +223,37 @@ function this.drawTank(myTank)
     -- Affichage du tank
     love.graphics.draw(
         myTank.imageTank, 
-        myTank.x + modules.game.offset.x, 
-        myTank.y + modules.game.offset.y, 
+        math.floor(myTank.x + modules.game.offset.x), 
+        math.floor(myTank.y + modules.game.offset.y), 
         myTank.angle, 
         1, 
         1, 
-        myTank.center.x, myTank.center.y)
+        math.floor(myTank.center.x), 
+        math.floor(myTank.center.y))
 
     if myTank.drawLife == true then
         -- On dessine la barre de vie des tanks
         love.graphics.setColor(255, 0, 0)
-        love .graphics.rectangle("fill", myTank.x - myTank.center.x + modules.game.offset.x, myTank.y - 1.5 * myTank.center.y + modules.game.offset.y, 2 * myTank.center.x, this.constantes.lifeBarHeight)
+        love .graphics.rectangle(
+            "fill", 
+            math.floor(myTank.x - myTank.center.x + modules.game.offset.x), 
+            math.floor(myTank.y - 1.5 * myTank.center.y + modules.game.offset.y), 
+            math.floor(2 * myTank.center.x), 
+            this.constantes.lifeBarHeight)
         love.graphics.setColor(0, 255, 0)
-        love .graphics.rectangle("fill", myTank.x - myTank.center.x + modules.game.offset.x, myTank.y - 1.5 * myTank.center.y + modules.game.offset.y, 2 * myTank.center.x * myTank.life / myTank.initialLife, this.constantes.lifeBarHeight)
+        love .graphics.rectangle(
+            "fill", 
+            math.floor(myTank.x - myTank.center.x + modules.game.offset.x), 
+            math.floor(myTank.y - 1.5 * myTank.center.y + modules.game.offset.y), 
+            math.floor(2 * myTank.center.x * myTank.life / myTank.initialLife), 
+            this.constantes.lifeBarHeight)
         love.graphics.setColor(255, 255, 255)
-        love .graphics.rectangle("line", myTank.x - myTank.center.x + modules.game.offset.x, myTank.y - 1.5 * myTank.center.y + modules.game.offset.y, 2 * myTank.center.x, this.constantes.lifeBarHeight)
+        love .graphics.rectangle(
+            "line", 
+            math.floor(myTank.x - myTank.center.x + modules.game.offset.x), 
+            math.floor(myTank.y - 1.5 * myTank.center.y + modules.game.offset.y), 
+            math.floor(2 * myTank.center.x), 
+            this.constantes.lifeBarHeight)
     end
 
     -- Spécificités du tank
@@ -248,6 +266,9 @@ function this.fire(myTank)
         myTank.lastShot = myMissile.reload
         myTank.module.fire(myTank)
         myTank.isFired = true
+        modules.game.fireShake = true
+        modules.game.amplitudeShake = myMissile.amplitudeShake
+        modules.game.fireShakeTtl = myMissile.timeShake
     end
 end
 

@@ -83,25 +83,6 @@ function this.drawObstacle(myObstacle)
             myObstacle.center.x,
             myObstacle.center.y) 
     end
-
-    -- love.graphics.setFont(modules.game.fonts.tiny)
-    -- local font = love.graphics.getFont()
-    -- local label
-    -- if myObstacle.hitBox.type == modules.hitbox.constantes.circleType then
-    --     love.graphics.circle("line", myObstacle.hitBox.x + modules.game.offset.x, myObstacle.hitBox.y + modules.game.offset.y, myObstacle.hitBox.radius)
-    --     label = myObstacle.hitBox.x .. "/" .. myObstacle.hitBox.y .. "/" .. myObstacle.hitBox.radius
-    --     -- love.graphics.print(
-    --     --     label,
-    --     --     myObstacle.hitBox.x + modules.game.offset.x - font:getWidth(label) / 2,
-    --     --     myObstacle.hitBox.y + modules.game.offset.y - font:getHeight(label) / 2)
-    -- elseif myObstacle.hitBox.type == modules.hitbox.constantes.rectangleType then
-    --     love.graphics.rectangle("line", myObstacle.hitBox.x + modules.game.offset.x, myObstacle.hitBox.y + modules.game.offset.y, myObstacle.hitBox.width, myObstacle.hitBox.height)
-    --     label = myObstacle.hitBox.x .. "/" .. myObstacle.hitBox.y .. "/" .. myObstacle.hitBox.width .. "/" .. myObstacle.hitBox.height
-    --     -- love.graphics.print(
-    --     --     label,
-    --     --     myObstacle.hitBox.x + modules.game.offset.x + (myObstacle.hitBox.width - font:getWidth(label)) / 2,
-    --     --     myObstacle.hitBox.y + modules.game.offset.y + (myObstacle.hitBox.height - font:getHeight(label)) / 2)
-    -- end
 end
 
 function this.ManageMissileObstacleCollision(myMissile, myObstacle)
@@ -118,7 +99,7 @@ function this.ManageMissileObstacleCollision(myMissile, myObstacle)
 end
 
 function this.ManageMissileTankCollision(myMissile, myTank)
-    if myMissile.tank ~= myTank then
+    if myMissile.tank.mode ~= myTank.mode then
         if modules.hitbox.IsCollision(myMissile.hitBox, myTank.hitBox) then
 
             -- On replace le missile à l'extérieur de l'obstacle pour son explosion                            
@@ -134,7 +115,7 @@ function this.ManageMissileTankCollision(myMissile, myTank)
 end
 
 function this.ManageExplosionTankCollision(myMissile, myTank)
-    if myMissile.tank ~= myTank then
+    if myMissile.tank.mode ~= myTank.mode then
         -- On inflige des dégats d'explosion au tank
         local explosionHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
         explosionHitbox.x = myMissile.x
@@ -240,8 +221,6 @@ function this.ManageCollision()
         end
 
         if tankStopped == false then
-            -- On applique les changements de vitesse
-            myTank.maxSpeed = myTank.speedFactor * myTank.maxSpeedLimit
 
             -- Est-ce que le tank rencontre un tank
             for i, myOtherTank in ipairs(modules.tank.tanks) do
@@ -249,6 +228,19 @@ function this.ManageCollision()
                     tankStopped = this.ManageTankTankCollision(myOtherTank, myTank)
                 end
             end
+        end
+
+        if tankStopped == false then
+            -- Récupération de la dalle du tank
+            local colonne = math.floor(myTank.x / modules.game.map.constantes.tiles.size.x) + 1 
+            local ligne = math.floor(myTank.y / modules.game.map.constantes.tiles.size.y) + 1  
+            local tile = modules.game.map.tiles[ligne * modules.game.map.constantes.tiles.number.x + colonne]
+            if modules.game.map.modifiers[tile] ~= nil then
+                myTank.speedFactor = myTank.speedFactor * modules.game.map.modifiers[tile]
+            end
+            
+            -- On applique les changements de vitesse
+            myTank.maxSpeed = myTank.speedFactor * myTank.maxSpeedLimit
         end
     end
 end

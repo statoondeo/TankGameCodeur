@@ -39,6 +39,7 @@ end
 function love.load()
     -- Changement du mode d'affichage
     love.window.setMode (1027, 768, { resizable = false, vsync = true, centered = true})
+    love.window.setTitle("Tank battleground")
 
     -- Chargement des modules
     loadModules()

@@ -9,7 +9,7 @@ this.constantes.modes.ennemy = 2
 this.constantes.acceleration = 3
 this.constantes.angleAcceleration = 2
 this.constantes.angleTolerance = math.pi / 36
-this.constantes.defaultAcceleration = 0.5  
+this.constantes.defaultAcceleration = 1  
 this.constantes.maxSpeed = 1
 this.constantes.maxSpeedEnnemy = 1
 this.constantes.tailLife = 1
@@ -25,6 +25,7 @@ this.constantes.states.moveDown = 3
 this.constantes.states.moveLeft = 4
 this.constantes.states.moveStop = 5
 this.constantes.states.moveBack = 6
+this.constantes.states.magneticTtl = 1
 
 -- Factory à tank
 function this.create(myTankMode, myTankSkin, x, y, angle)
@@ -38,40 +39,28 @@ function this.create(myTankMode, myTankSkin, x, y, angle)
     myTank.initialLife = this.constantes.initialLife
     myTank.life = myTank.initialLife
     myTank.state = this.constantes.states.goAhead
-    myTank.previousState = myTank.state
     myTank.checkTtl = this.constantes.states.checkTtl
+    myTank.beaconTtl = this.constantes.states.magneticTtl
     return myTank
 end
 
 function this.updateTank(dt, myTank)
-    if myTank.previousState ~= myTank.state then
-        print("State=", myTank.previousState, myTank.state)
-        myTank.previousState = myTank.state
-    end
     -- Est-ce que le tank rencontre une balise directionnelle?
     local myTankHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
     myTankHitbox.x = myTank.hitBox.x
     myTankHitbox.y = myTank.hitBox.y
     myTankHitbox.radius = 2
     for i, myBeacon in ipairs(modules.game.map.beacons) do
-        -- Hitbox de la balise
-        local myBeaconHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
-        myBeaconHitbox.x = myBeacon[2]
-        myBeaconHitbox.y = myBeacon[3]
-        myBeaconHitbox.radius = myBeacon[4]
-
         -- Préparation à la rencontre avec une balise, on ralentit
-        if modules.hitbox.IsCollision(myTank.hitBox, myBeaconHitbox) and myBeacon[1] ~= myTank.lastBeacon then
+        if modules.hitbox.IsCollision(myTank.hitBox, myBeacon) and myBeacon.id ~= myTank.lastBeacon and myTank.state ~= this.constantes.states.moveStop then
             myTank.state = this.constantes.states.moveStop
-        end
-
-        -- Rencontre avec la balise
-        if modules.hitbox.IsCollision(myTankHitbox, myBeaconHitbox) and myBeacon[1] ~= myTank.lastBeacon then
-            myTank.lastBeacon = myBeacon[1]
-            myTank.state = myBeacon[5][love.math.random(1, #myBeacon[5])]
-            myTank.x = myBeaconHitbox.x
-            myTank.y = myBeaconHitbox.y
-            break
+            -- tank pris en charge par la balise
+            myTank.beaconTtl = 0
+            myTank.beacon = myBeacon
+            myTank.beaconX = myTank.x
+            myTank.beaconDistX = myBeacon.x - myTank.x
+            myTank.beaconY = myTank.y
+            myTank.beaconDistY = myBeacon.y - myTank.y
         end
     end
 
@@ -138,10 +127,17 @@ function this.moveAheadState(dt, myTank)
 end
 
 function this.moveStopState(dt, myTank)
-    -- Si on n'accélère pas, le tank ralenti de lui-même
-    myTank.speed = myTank.speed - this.constantes.defaultAcceleration * dt
-    if myTank.speed <= 0 then
-        myTank.speed = 0
+    myTank.beaconTtl = myTank.beaconTtl + dt
+    if myTank.beaconTtl >= this.constantes.states.magneticTtl then
+        myTank.lastBeacon = myTank.beacon.id
+        myTank.state = myTank.beacon.directions[love.math.random(1, #myTank.beacon.directions)]
+        myTank.x = myTank.beacon.x
+        myTank.y = myTank.beacon.y
+        myTank.beacon = nil
+        myTank.beaconTtl = this.constantes.states.magneticTtl
+    else
+        myTank.x = myTank.beaconX + myTank.beaconDistX * modules.tweening.easingLin(myTank.beaconTtl / this.constantes.states.magneticTtl)
+        myTank.y = myTank.beaconY + myTank.beaconDistY * modules.tweening.easingLin(myTank.beaconTtl / this.constantes.states.magneticTtl)
     end
 end
 
@@ -152,9 +148,7 @@ function this.rotate(dt, myTank, myAngle)
         myTank.angle = myAngle
         myTank.state = this.constantes.states.goAhead
     else
-        if diffAngle < 0 then
-            diffAngle = diffAngle + 2 * math.pi
-        end
+        diffAngle = (diffAngle + 2 * math.pi) % (2 * math.pi)
         if diffAngle > math.pi then
             myTank.angle = (myTank.angle - this.constantes.angleAcceleration * dt) % (2 * math.pi)
         else

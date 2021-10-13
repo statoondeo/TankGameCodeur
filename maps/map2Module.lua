@@ -30,29 +30,32 @@ this.tiles =
 -- Point de départ du joueur
 this.start = 
 {
-    95, 180, math.pi / 2
+    2, 3, math.pi / 2
 }
 
 -- Liste des ennemis
 this.ennemis = 
 {
-    { 5, 420, 96, 0 },
-    { 5, 420, 672, 0 },
-    { 5, 1056, 96, 0 },
-    { 5, 1056, 672, 0 },
-    { 6, 1440, 352, math.pi / 2 },
+    { 5, 7, 2, 0 },
+    { 5, 7, 11, math.pi },
+    { 5, 19, 2, 0 },
+    { 5, 19, 11, math.pi },
+    { 6, 22, 6, math.pi / 2 },
 }
 
 -- Bornes de la carte
 local rightBound = this.constantes.tiles.number.x * this.constantes.tiles.size.x
 local bottomBound = this.constantes.tiles.number.y * this.constantes.tiles.size.y
-this.goals = 
+this.goals1 = 
 {
-    { 1290, 80, 15, true },
-    { 1290, 660, 15, true },
-    { 700, 250, 15, true }
+    { 12, 8, 20, true },
+    { 18, 1, 20, true },
+    { 6, 12, 20, true }
 }
-
+this.goals2 = 
+{
+    { 2, 3, 20, false },
+}
 -- Numéro de carte
 this.number = 2
 
@@ -77,10 +80,10 @@ this.obstacles =
 
     -- Bornes de l'écran pour éviter que les tanks ou les missiles ne sortent
     --  1    2                  3                  4   5   6       7       8   9       10  11                  12               13
-    {   0,  -100,                -100,               0,  1,  true,   true,   1,  false,  0,  rightBound + 200,   105,              { 1, 4 } },
-    {   0,  -100,                0,                 0,  1,  true,   true,   1,  false,  0,  105,                 bottomBound,     { 1, 4 } },
-    {   0,  -100,                bottomBound - 5,  0,  1,  true,   true,   1,  false,  0,  rightBound + 200,   105,              { 1, 4 } },
-    {   0,  rightBound - 5,    0,                 0,  1,  true,   true,   1,  false,  0,  105,                  bottomBound,    { 1, 4 } },
+    {   0,  -54,                -54,               0,  1,  true,   true,   1,  false,  0,  rightBound + 128,   64,              { 1, 4 } },
+    {   0,  -54,                0,                 0,  1,  true,   true,   1,  false,  0,  64,                 bottomBound,     { 1, 4 } },
+    {   0,  -54,                bottomBound - 10,  0,  1,  true,   true,   1,  false,  0,  rightBound + 128,   64,              { 1, 4 } },
+    {   0,  rightBound - 10,    0,                 0,  1,  true,   true,   1,  false,  0,  64,                  bottomBound,    { 1, 4 } },
 
     -- Zones vides à peupler
     --  1    2      3       4       5       6       7       8   9       10  11      12      13
@@ -93,13 +96,6 @@ this.obstacles =
     {   0,  800,    50,     0,      1,      false,   true,   1,  false,  0,  80,    50,    { 7, 8 } },
     {   0,  1040,   400,    0,      1,      true,   true,   1,  false,  0,  300,    170,    { 1, 4 } },
     {   0,  1250,   180,    0,      1,      false,   true,   1,  false,  0,  80,     80,     { 7, 8 } },
-
-    -- {   7,  540,    210,    love.math.random(),   love.math.random() * 0.2 + 0.9, true,   true,   1,   true,  0,  0,  0,  {} },
-    -- {   7,  510,    210,    love.math.random(),   love.math.random() * 0.2 + 0.9, true,   true,   1,   true,  0,  0,  0,  {} },
-    -- {   7,  570,    210,    love.math.random(),   love.math.random() * 0.2 + 0.9, true,   true,   1,   true,  0,  0,  0,  {} },
-    -- {   8,  710,    320,    love.math.random(),   love.math.random() * 0.2 + 0.9, true,   true,   1,   true,  0,  0,  0,  {} },
-    -- {   8,  710,    350,    love.math.random(),   love.math.random() * 0.2 + 0.9, true,   true,   1,   true,  0,  0,  0,  {} },
-    -- {   8,  710,    380,    love.math.random(),   love.math.random() * 0.2 + 0.9, true,   true,   1,   true,  0,  0,  0,  {} },
 
     {   love.math.random(9, 10),  146,236,    love.math.random(),   love.math.random() * 0.2 + 0.9, false, false, 2/3,   true,  0,  0,  0,  {} },
     {   love.math.random(9, 10),  65,76,    love.math.random(),   love.math.random() * 0.2 + 0.9, false, false, 2/3,   true,  0,  0,  0,  {} },
@@ -138,10 +134,11 @@ function this.init()
     this.angle = 0
     this.goalAchieved = 0
     this.goalHitbox = {}
+    this.goals = this.goals1
     for i = 1, #this.goals do
         local goalHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
-        goalHitbox.x = this.goals[i][1]
-        goalHitbox.y = this.goals[i][2]
+        goalHitbox.x = (this.goals[i][1] - 0.5) * this.constantes.tiles.size.x
+        goalHitbox.y = (this.goals[i][2] - 0.5) * this.constantes.tiles.size.y
         goalHitbox.radius = this.goals[i][3]
         goalHitbox.achieved = false
         goalHitbox.bonus = this.goals[i][4]
@@ -171,19 +168,23 @@ function this.CheckPlayerWin()
         if allGoalAchieved == true then
             this.missionStep = 2
             this.goalHitbox = {}
-            local goalHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
-            goalHitbox.x = this.start[1]
-            goalHitbox.y = this.start[2]
-            goalHitbox.radius = 15
-            goalHitbox.achieved = false
-            goalHitbox.bonus = false
-            table.insert(this.goalHitbox, goalHitbox)
+            this.goals = this.goals2
+            for i = 1, #this.goals do
+                local goalHitbox = modules.hitbox.create(modules.hitbox.constantes.circleType)
+                goalHitbox.x = (this.goals[i][1] - 0.5) * this.constantes.tiles.size.x
+                goalHitbox.y = (this.goals[i][2] - 0.5) * this.constantes.tiles.size.y
+                goalHitbox.radius = this.goals[i][3]
+                goalHitbox.achieved = false
+                goalHitbox.bonus = this.goals[i][4]
+                table.insert(this.goalHitbox, goalHitbox)
+            end
             modules.game.displayGameMessage({"Mission update", "Get back to start to escape", "Stay alive"})
         end
 
     elseif this.missionStep == 2 then
         if modules.hitbox.IsCollision(modules.game.playerTank.hitBox, this.goalHitbox[1]) == true then
             this.goalHitbox[1].achieved = true
+            modules.game.sounds.validation:play()
         end
         win = this.goalHitbox[1].achieved
         if win == true then
@@ -290,7 +291,7 @@ function this.keypressed(key, scancode, isrepeat)
         if this.playerWin == true then
             modules.game.changeScreen(modules.game.loadmap, require("maps/mainTitleModule")) 
         elseif this.playerLoose == true then
-            modules.game.changeScreen(modules.game.loadmap, require("maps/mainTitleModule")) 
+            modules.game.changeScreen(modules.game.loadmap, require("maps/map2Module"), modules.game.playerTank.skin) 
         end
 
     elseif key == "space" then

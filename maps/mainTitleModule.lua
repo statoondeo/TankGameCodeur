@@ -110,47 +110,62 @@ function this.draw()
     love.graphics.setFont(modules.game.fonts.giant)
     local font = love.graphics.getFont()
     local label = "Tanks"
-    love.graphics.print(label, (love.graphics.getWidth() - font:getWidth(label)) / 2, (love.graphics.getHeight() - font:getHeight(label)) / 7)
+    love.graphics.print(
+        label, 
+        math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
+        math.floor((love.graphics.getHeight() - font:getHeight(label)) / 7))
     love.graphics.setFont(modules.game.fonts.large)
     font = love.graphics.getFont()
     label = "Battleground"
-    love.graphics.print(label, (love.graphics.getWidth() - font:getWidth(label)) / 2, 2 * (love.graphics.getHeight() - font:getHeight(label)) / 7)
+    love.graphics.print(
+        label, 
+        math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
+        math.floor(2 * (love.graphics.getHeight() - font:getHeight(label)) / 7))
 
     love.graphics.setFont(modules.game.fonts.small)
     font = love.graphics.getFont()
     label = "Raphael DUCHOSSOY (GameCodeur.fr)"
-    love.graphics.print(label, (love.graphics.getWidth() - font:getWidth(label)) / 2, 3 * (love.graphics.getHeight() - font:getHeight(label)) / 7)
+    love.graphics.print(
+        label, 
+        math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
+        math.floor(3 * (love.graphics.getHeight() - font:getHeight(label)) / 7))
     label = "\"Click\" to fire, \"Arrows\" to select tank, \"Escape\" to quit"
-    love.graphics.print(label, (love.graphics.getWidth() - font:getWidth(label)) / 2, 6 * (love.graphics.getHeight() - font:getHeight(label)) / 7)
+    love.graphics.print(
+        label, 
+        math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
+        math.floor(6 * (love.graphics.getHeight() - font:getHeight(label)) / 7))
 
     love.graphics.setFont(modules.game.fonts.medium)
     font = love.graphics.getFont()
     label = "\"Enter\" to start"
     love.graphics.setColor(255, 255, 255, modules.tweening.easingInOutCubic(this.buttonStartBlinkTimer / this.innerConstantes.buttonStartBlinkTimerLength))
-    love.graphics.print(label, (love.graphics.getWidth() - font:getWidth(label)) / 2, 4 * (love.graphics.getHeight() - font:getHeight(label)) / 7)
+    love.graphics.print(
+        label, 
+        math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
+        math.floor(4 * (love.graphics.getHeight() - font:getHeight(label)) / 7))
     love.graphics.setColor(255, 255, 255)
 
     -- On affiche les médailles
     for i = 1, 3 do
         love.graphics.draw(
             modules.game.images.medals[i],
-            (love.graphics:getWidth() - modules.game.images.medals[i]:getWidth()) / 7,
-            150 + 1.5 * (i - 1) * modules.game.images.medals[i]:getHeight(),
+            math.floor((love.graphics:getWidth() - modules.game.images.medals[i]:getWidth()) / 7),
+            math.floor(150 + 1.5 * (i - 1) * modules.game.images.medals[i]:getHeight()),
             0,
             1 + i / 5,
             1 + i / 5,
-            modules.game.images.medals[i]:getWidth() / 2,
-            modules.game.images.medals[i]:getHeight() / 2
+            math.floor(modules.game.images.medals[i]:getWidth() / 2),
+            math.floor(modules.game.images.medals[i]:getHeight() / 2)
         )
         love.graphics.draw(
             modules.game.images.medals[i],
-            6 * (love.graphics:getWidth() - modules.game.images.medals[i]:getWidth()) / 7,
-            150 + 1.5 * (i - 1) * modules.game.images.medals[i]:getHeight(),
+            math.floor(6 * (love.graphics:getWidth() - modules.game.images.medals[i]:getWidth()) / 7),
+            math.floor(150 + 1.5 * (i - 1) * modules.game.images.medals[i]:getHeight()),
             0,
             1 + i / 5,
             1 + i / 5,
-            modules.game.images.medals[i]:getWidth() / 2,
-            modules.game.images.medals[i]:getHeight() / 2
+            math.floor(modules.game.images.medals[i]:getWidth() / 2),
+            math.floor(modules.game.images.medals[i]:getHeight() / 2)
         )
     end
 
@@ -160,8 +175,8 @@ function this.draw()
         label = this.tanks[this.currentTank].label
         love.graphics.print(
             label, 
-            (love.graphics.getWidth() - font:getWidth(label)) / 2, 
-            5.4 * love.graphics.getHeight() / 7)    
+            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
+            math.floor(5.4 * love.graphics.getHeight() / 7))    
     end
 
     -- On affiche les tank

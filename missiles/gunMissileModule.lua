@@ -4,7 +4,7 @@ this.constantes = {}
 
 -- Tir groupé
 this.constantes.mode = 2
-this.constantes.scope = 250
+this.constantes.scope = 225
 this.constantes.minScope = 150
 this.constantes.maxScope = 200
 this.constantes.reload = 0.5
@@ -21,6 +21,9 @@ this.constantes.fire.zoom = 1.3
 this.constantes.damage = {}
 this.constantes.damage.missile = 110
 this.constantes.damage.explosion = 55
+this.constantes.shake = {}
+this.constantes.shake.amplitude = 15
+this.constantes.shake.time = 0.15
 
 -- Factory à missiles
 function this.create(myTank)
@@ -65,6 +68,8 @@ function this.init(myMissile)
     myMissile.damage.missile = this.constantes.damage.missile
     myMissile.damage.explosion = this.constantes.damage.explosion
     myMissile.explosionHitbox.radius = this.constantes.explosionZoom * modules.missile.images.missiles[1]:getWidth()
+    myMissile.amplitudeShake = this.constantes.shake.amplitude
+    myMissile.timeShake = this.constantes.shake.time
     table.insert(modules.missile.missiles, myMissile)
 end
 

@@ -162,9 +162,7 @@ end
 
 function this.updateFireSound(myMissile)
     -- Son d'explosion du missile si pas encore fait
-    if this.sounds.shots[1]:isPlaying() then
-        this.sounds.shots[1]:stop()
-    end
+    this.sounds.shots[1]:stop()
     this.sounds.shots[1]:setPitch(myMissile.octave)
     this.sounds.shots[1]:play()
     myMissile.fireSoundStarted = true
@@ -235,13 +233,13 @@ function this.drawExplosion(myMissile)
     if myMissile.explosionImage ~= nil then
         love.graphics.draw(
             myMissile.explosionImage, 
-            myMissile.hitBox.x + modules.game.offset.x, 
-            myMissile.hitBox.y + modules.game.offset.y, 
+            math.floor(myMissile.hitBox.x + modules.game.offset.x), 
+            math.floor(myMissile.hitBox.y + modules.game.offset.y), 
             myMissile.angle, 
             myMissile.explosionZoom, 
             myMissile.explosionZoom, 
-            myMissile.explosionImage:getWidth() / 2, 
-            myMissile.explosionImage:getHeight() / 2)
+            math.floor(myMissile.explosionImage:getWidth() / 2), 
+            math.floor(myMissile.explosionImage:getHeight() / 2))
     end
 end
 
@@ -250,13 +248,13 @@ function this.drawActiveMissile(myMissile)
     if myMissile.hitBox.type ~= modules.hitbox.constantes.noneType then
         love.graphics.draw(
             myMissile.image, 
-            myMissile.x + modules.game.offset.x, 
-            myMissile.y + modules.game.offset.y, 
+            math.floor(myMissile.x + modules.game.offset.x), 
+            math.floor(myMissile.y + modules.game.offset.y), 
             myMissile.angle,
             1,
             1,
-            myMissile.center.x, 
-            myMissile.center.y)
+            math.floor(myMissile.center.x), 
+            math.floor(myMissile.center.y))
     end
 end
 
@@ -264,13 +262,13 @@ function this.drawFire(myMissile)
     if myMissile.fireImage ~= nil then
         love.graphics.draw(
             myMissile.fireImage, 
-            myMissile.tank.turret.output.x + modules.game.offset.x, 
-            myMissile.tank.turret.output.y + modules.game.offset.y, 
+            math.floor(myMissile.tank.turret.output.x + modules.game.offset.x), 
+            math.floor(myMissile.tank.turret.output.y + modules.game.offset.y), 
             myMissile.angle, 
             myMissile.fireZoom, 
             myMissile.fireZoom, 
             0, 
-            myMissile.fireImage:getHeight() / 2)
+            math.floor(myMissile.fireImage:getHeight() / 2))
     end
 end
 
