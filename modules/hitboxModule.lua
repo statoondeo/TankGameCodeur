@@ -20,20 +20,20 @@ function this.create(myHitboxType)
 end
 
 -- Affichage de la hitbox
-function this.draw(myHitbox, myOffset, showHitBox)
-    if showHitBox == true then
+function this.drawHitbox(myHitbox)
+    if myHitbox.type ~= nil then
         if myHitbox.type == this.constantes.rectangleType then
             love.graphics.rectangle(
                 "line", 
-                myHitbox.x + myOffset.x, 
-                myHitbox.y + myOffset.y, 
+                myHitbox.x + game.offset.x, 
+                myHitbox.y + game.offset.y, 
                 myHitbox.width,
                 myHitbox.height)    
         elseif myHitbox.type == this.constantes.circleType then
             love.graphics.circle(
                 "line", 
-                myHitbox.x + myOffset.x, 
-                myHitbox.y + myOffset.y, 
+                myHitbox.x + game.offset.x, 
+                myHitbox.y + game.offset.y, 
                 myHitbox.radius)
         end
     end

@@ -236,10 +236,12 @@ function this.load()
 end
 
 function this.init(myMap)
+    -- On remet à zéro les données
     this.missile.missiles = {}
     this.tank.tanks = {}
     this.turret.turrets = {}
     this.obstacle.obstacles = {}
+
     this.map = myMap
     this.map.init()
 
@@ -251,7 +253,7 @@ function this.init(myMap)
         tileBeacon[beacon[1]] = beacon[2]
     end
 
-    -- Construction du tableau de correspondance tuile/direction
+    -- Construction du tableau de correspondance tuile/direction de la map
     if this.map.modifiers == nil then
         this.map.modifiers = {}
         for i, modifier in ipairs(this.tileModifiers) do
@@ -259,6 +261,7 @@ function this.init(myMap)
         end       
     end
 
+    -- Construction du tableau de correspondance tuile/direction de la map
     if this.map.beacons == nil then
         -- On parcour la map
         this.map.beacons = {}
@@ -277,57 +280,55 @@ function this.init(myMap)
         end         
     end  
 
-    if this.map.additionalDecors == nil then
-        -- On ajoute les obstacles de la map à la collection du niveau en cours
-        this.map.additionalDecors = {}
-        for i, myObstacle in ipairs(this.map.obstacles) do
-            table.insert(
-                this.obstacle.obstacles, 
-                this.obstacle.create(
-                    myObstacle[1], 
-                    myObstacle[2], 
-                    myObstacle[3], 
-                    myObstacle[4], 
-                    myObstacle[5], 
-                    myObstacle[6], 
-                    myObstacle[7],
-                    myObstacle[8],
-                    myObstacle[9],
-                    myObstacle[10],
-                    myObstacle[11],
-                    myObstacle[12]))
+    -- On ajoute les obstacles de la map à la collection du niveau en cours
+    this.map.additionalDecors = {}
+    for i, myObstacle in ipairs(this.map.obstacles) do
+        table.insert(
+            this.obstacle.obstacles, 
+            this.obstacle.create(
+                myObstacle[1], 
+                myObstacle[2], 
+                myObstacle[3], 
+                myObstacle[4], 
+                myObstacle[5], 
+                myObstacle[6], 
+                myObstacle[7],
+                myObstacle[8],
+                myObstacle[9],
+                myObstacle[10],
+                myObstacle[11],
+                myObstacle[12]))
 
-            -- Remplissage des zones à peupler avec des décorations
-            if myObstacle[1] == 0 then
-                -- On remplit chaque zone demandée
-                local j = myObstacle[2]
-                while j < myObstacle[2] + myObstacle[11] do
-                    local k = myObstacle[3]
-                    while k < myObstacle[3] + myObstacle[12] do
-                        if myObstacle[13][1] ~= nil and myObstacle[13][2] ~= nil then
-                            table.insert(
-                                this.map.additionalDecors, 
-                                this.obstacle.create(
-                                    love.math.random(myObstacle[13][1], myObstacle[13][2]), 
-                                    j + 12, 
-                                    k + 12, 
-                                    love.math.random() * math.pi, 
-                                    love.math.random() * 0.4 + 0.8, 
-                                    false, 
-                                    false,
-                                    1,
-                                    nil,
-                                    0,
-                                    0,
-                                    0))
-                        end
-                        k = k + love.math.random(16, 48)
+        -- Remplissage des zones à peupler avec des décorations
+        if myObstacle[1] == 0 then
+            -- On remplit chaque zone demandée
+            local j = myObstacle[2]
+            while j < myObstacle[2] + myObstacle[11] - 16 do
+                local k = myObstacle[3]
+                while k < myObstacle[3] + myObstacle[12] - 16 do
+                    if myObstacle[13][1] ~= nil and myObstacle[13][2] ~= nil then
+                        table.insert(
+                            this.map.additionalDecors, 
+                            this.obstacle.create(
+                                love.math.random(myObstacle[13][1], myObstacle[13][2]), 
+                                j + 16, 
+                                k + 16, 
+                                love.math.random() * math.pi, 
+                                love.math.random() * 0.4 + 0.8, 
+                                false, 
+                                false,
+                                1,
+                                nil,
+                                0,
+                                0,
+                                0))
                     end
-                    j = j + love.math.random(16, 48)
+                    k = k + love.math.random(16, 48)
                 end
+                j = j + love.math.random(16, 48)
             end
-        end       
-    end
+        end
+    end       
 
     -- Création du tank joueur
     local tankX
@@ -817,6 +818,12 @@ function this.keypressed(key, scancode, isrepeat)
         if this.mode == this.constantes.modes.message then
             this.mode = this.constantes.modes.quitMessage
         end
+
+    elseif key == "b" then
+        -- TODO : A retirer
+        -- Touche pour tester la tache de sang
+        game.bloodShake = true        
+
     end
     this.map.keypressed(key, scancode, isrepeat)
 end

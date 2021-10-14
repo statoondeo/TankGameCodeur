@@ -72,6 +72,7 @@ function this.drawObstacle(myObstacle)
                 myObstacle.center.x,
                 myObstacle.center.y) 
     end
+    -- game.hitbox.drawHitbox(myObstacle.hitBox)
 end
 
 function this.ManageMissileObstacleCollision(myMissile, myObstacle)
@@ -157,7 +158,6 @@ end
 
 -- Calculs de collision
 function this.ManageCollision()
-
     -- Gestion des missiles
     for i, myMissile in pairs(game.missile.missiles) do
         
@@ -196,42 +196,43 @@ function this.ManageCollision()
 
     -- Gestion des tanks
     for i, myTank in pairs(game.tank.tanks) do
-        local tankStopped = false
-        myTank.speedFactor = 1
 
-        -- Est-ce que le tank rencontre un obstacle
-        for i, myObstacle in ipairs(this.obstacles) do
-            tankStopped = this.ManageTankObstacleCollision(myTank, myObstacle)
-            if tankStopped == true then
-                break
-            end
-        end
+        -- On en traite que les tanks actifs
+        if myTank.outDated == false then
+            
+            local tankStopped = false
+            myTank.speedFactor = 1
 
-        if tankStopped == false then
-
-            -- Est-ce que le tank rencontre un tank
-            for i, myOtherTank in ipairs(game.tank.tanks) do
-                if myOtherTank ~= myTank then
-                    tankStopped = this.ManageTankTankCollision(myOtherTank, myTank)
+            -- Est-ce que le tank rencontre un obstacle
+            for i, myObstacle in ipairs(this.obstacles) do
+                tankStopped = this.ManageTankObstacleCollision(myTank, myObstacle)
+                if tankStopped == true then
+                    break
                 end
             end
-        end
 
-        if tankStopped == false then
-            -- Récupération de la dalle du tank
-            local colonne = math.floor(myTank.x / game.map.constantes.tiles.size.x) + 1 
-            local ligne = math.floor(myTank.y / game.map.constantes.tiles.size.y) + 1  
-            local tile = game.map.tiles[ligne * game.map.constantes.tiles.number.x + colonne]
-            if game.map.modifiers[tile] ~= nil then
-                myTank.speedFactor = myTank.speedFactor * game.map.modifiers[tile]
-            end
-            
-            if myTank.id == 4 then
-                print("Speed=>", colonne, ligne, tile, game.map.modifiers[tile])
+            if tankStopped == false then
+
+                -- Est-ce que le tank rencontre un tank
+                for i, myOtherTank in ipairs(game.tank.tanks) do
+                    if myOtherTank ~= myTank then
+                        tankStopped = this.ManageTankTankCollision(myOtherTank, myTank)
+                    end
+                end
             end
 
-            -- On applique les changements de vitesse
-            myTank.maxSpeed = myTank.speedFactor * myTank.maxSpeedLimit
+            if tankStopped == false then
+                -- Récupération de la dalle du tank
+                local colonne = math.floor(myTank.x / game.map.constantes.tiles.size.x) + 1 
+                local ligne = math.floor(myTank.y / game.map.constantes.tiles.size.y) + 1  
+                local tile = game.map.tiles[ligne * game.map.constantes.tiles.number.x + colonne]
+                if game.map.modifiers[tile] ~= nil then
+                    myTank.speedFactor = myTank.speedFactor * game.map.modifiers[tile]
+                end
+                
+                -- On applique les changements de vitesse
+                myTank.maxSpeed = myTank.speedFactor * myTank.maxSpeedLimit
+            end
         end
     end
 end

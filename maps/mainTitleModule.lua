@@ -211,11 +211,6 @@ function this.keypressed(key, scancode, isrepeat)
                 this.selectionDirection = 1
             end
             game.sounds.switch:play()
-        
-        elseif key == "b" then
-            -- TODO : A retirer
-            -- Touche pour tester la tache de sang
-            game.bloodShake = true
 
         elseif key == "return" then
             game.sounds.validation:play()

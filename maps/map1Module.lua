@@ -69,12 +69,23 @@ this.obstacles =
     {   8,  780,    210,    love.math.random(0, 2 * math.pi),   1,                      false,  true,  1, true,  0,  0,  0,  {} },
     {   8,  810,    210,    love.math.random(0, 2 * math.pi),   1,                      false,  true,  1, true,  0,  0,  0,  {} },
     {   8,  840,    210,    love.math.random(0, 2 * math.pi),   1,                      false,  true,  1, true,  0,  0,  0,  {} },
-    {  11,  400,    400,    love.math.random(0, 2 * math.pi),   love.math.random(0.9, 1.1), false,  false,  1/5, true,  0,  0,  0,  {} },
+    {  11,  400,    400,    love.math.random(0, 2 * math.pi),   love.math.random() * 0.2 + 0.9, false,  false,  1/5, true,  0,  0,  0,  {} },
+
+    {  love.math.random(9, 10),  146,236,    love.math.random(),   love.math.random() * 0.2 + 0.8, false, false, 2/3,   true,  0,  0,  0,  {} },
+    {  love.math.random(9, 10),  65,76,    love.math.random(),   love.math.random() * 0.2 + 0.8, false, false, 2/3,   true,  0,  0,  0,  {} },
+    {  love.math.random(9, 10),  47,343,    love.math.random(),   love.math.random() * 0.2 + 0.8, false, false, 2/3,   true,  0,  0,  0,  {} },
+    {  love.math.random(9, 10),  175,635,    love.math.random(),   love.math.random() * 0.2 + 0.8, false, false, 2/3,   true,  0,  0,  0,  {} },
+    {  love.math.random(9, 10),  153,737,    love.math.random(),   love.math.random() * 0.2 + 0.8, false, false, 2/3,   true,  0,  0,  0,  {} },
+    {  love.math.random(9, 10),  572,638,    love.math.random(),   love.math.random() * 0.2 + 0.8, false, false, 2/3,   true,  0,  0,  0,  {} },
+    {  love.math.random(9, 10),  736,694,    love.math.random(),   love.math.random() * 0.2 + 0.8, false, false, 2/3,   true,  0,  0,  0,  {} },
+    {  love.math.random(9, 10),  556,250,    love.math.random(),   love.math.random() * 0.2 + 0.8, false, false, 2/3,   true,  0,  0,  0,  {} },
+
     -- Bornes de l'écran pour éviter que les tanks ou les missiles ne sortent
     {  0,   -54,   -54,   0,                              1,  true,   true,   1,    false, 0,  love.graphics:getWidth() + 128,  64,  { 1, 6 } },
     {  0,   -54,   0,      0,                              1,  true,   true,   1,    false, 0,  64,  love.graphics:getHeight(),  { 1, 6 } },
     {  0,   -54,   love.graphics:getHeight() - 10,   0,         1,  true,   true,   1,    false, 0,  love.graphics:getWidth() + 128,  64,  { 1, 6 } },
     {  0,   love.graphics:getWidth() - 10,   0,      0,          1,  true,   true,   1,    false, 0,  64,  love.graphics:getHeight(),  { 1, 6 } },
+    
     -- Zones vides à peupler
     {  0,   90,    360,    0, 1,     true,   true,  1, false, 0,  160,  120,  { 1, 6} },
     {  0,   0,    610,    0, 1,     true,   true,  1, false, 0,  240,  130,  { 1, 6} },
