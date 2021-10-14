@@ -45,6 +45,7 @@ function this.create(imageIndex, x, y, angle, zoom, stopMissile, stopTank, speed
 end
 
 function this.update(dt)
+    this.ManageCollision()
     for i, myObstacle in ipairs(this.obstacles) do
         this.updateObstacle(dt, myObstacle)
     end
@@ -225,6 +226,10 @@ function this.ManageCollision()
                 myTank.speedFactor = myTank.speedFactor * game.map.modifiers[tile]
             end
             
+            if myTank.id == 4 then
+                print("Speed=>", colonne, ligne, tile, game.map.modifiers[tile])
+            end
+
             -- On applique les changements de vitesse
             myTank.maxSpeed = myTank.speedFactor * myTank.maxSpeedLimit
         end

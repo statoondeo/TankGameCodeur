@@ -236,9 +236,11 @@ function this.fire(myTank)
         myTank.lastShot = myMissile.reload
         myTank.module.fire(myTank)
         myTank.isFired = true
-        game.fireShake = true
-        game.amplitudeShake = myMissile.amplitudeShake
-        game.fireShakeTtl = myMissile.timeShake
+        if myTank.mode == game.constantes.tank.modes.player then
+            game.fireShake = true
+            game.amplitudeShake = myMissile.amplitudeShake
+            game.fireShakeTtl = myMissile.timeShake
+        end
     end
 end
 

@@ -20,7 +20,7 @@ function this.easingLin(x)
     return x
 end
 
-function this.easeOutBack(x)
+function this.easingOutBack(x)
     local c1 = 1.70158;
     local c3 = c1 + 1;
     

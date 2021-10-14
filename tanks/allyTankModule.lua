@@ -63,6 +63,7 @@ function this.drawTank(myTank)
 end
 
 function this.Damage(myTank, damages)
+    game.bloodShake = true
 end
 
 function this.fire(myTank)

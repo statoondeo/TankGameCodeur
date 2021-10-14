@@ -200,6 +200,9 @@ function this.load()
     this.images.bandeau = love.graphics.newImage("images/bandeau.png")
     this.images.bonus = love.graphics.newImage("images/bonus_1.png")
     this.images.cross = love.graphics.newImage("images/cross.png")
+    this.images.blood = love.graphics.newImage("images/blood.png")
+
+    -- Curseurs
     this.images.cursor = love.mouse.newCursor("images/crosshair.png", 0, 0)
 
     -- Fonts
@@ -355,6 +358,11 @@ function this.init(myMap)
 
     this.initialTtl = 0
     this.mode = this.constantes.modes.init
+    
+    this.bloodShake = false
+    this.bloodShakeMaxTtl = 1
+    this.bloodShakeTtl = this.bloodShakeMaxTtl
+    
     this.fireShake = false
     this.fireShakeMaxTtl = 0.15
     this.fireShakeTtl = this.fireShakeMaxTtl
@@ -492,12 +500,12 @@ function this.update(dt)
             
             -- Mise à jour de la position de la caméra
             this.updateCamera(dt)
+            
+            -- Si une tache de sang est affichée on la met à jour
+            this.updateBloodShake(dt)
 
             -- On met à jour la carte
             this.map.update(dt, mouse)
-    
-            -- Gestion des collisions
-            this.obstacle.ManageCollision()
     
             -- On met à jour les obstacles
             this.obstacle.update(dt)
@@ -511,6 +519,53 @@ function this.update(dt)
             -- On update les missiles
             this.missile.update(dt)
         end
+    end
+end
+
+function this.updateBloodShake(dt)
+    if this.bloodShake == true then
+        this.bloodShakeTtl = this.bloodShakeTtl - dt
+        if this.bloodShakeTtl >= 0 then
+            if this.bloodShakeTtl >= 0.8 * this.bloodShakeMaxTtl then
+                -- Arrivée de la tache de sang
+                local maxRange = this.bloodShakeMaxTtl
+                local minRange = 0.8 * this.bloodShakeMaxTtl
+                local currentRange = this.bloodShakeTtl
+                local tweenValue = (maxRange - currentRange) / (maxRange - minRange)
+
+                this.bloodShakeZoom = this.tweening.easingOutBack(tweenValue)
+                this.bloodShakeAlpha = this.tweening.easingLin(tweenValue)
+            else
+                -- Disparition de la tache de sang
+                local maxRange = 0.8 * this.bloodShakeMaxTtl
+                local minRange = 0
+                local currentRange = this.bloodShakeTtl
+                local tweenValue = currentRange / (maxRange - minRange)
+
+                this.bloodShakeZoom = 1
+                this.bloodShakeAlpha = this.tweening.easingLin(tweenValue)
+            end
+        else
+            this.bloodShake = false
+            this.bloodShakeTtl = this.bloodShakeMaxTtl
+        end
+    end
+end
+
+function this.drawBloodShake()
+    if this.bloodShake == true then
+        love.graphics.setColor(255, 255, 255, this.bloodShakeAlpha)
+        love.graphics.draw(
+            this.images.blood,
+            love.graphics:getWidth() / 2,
+            love.graphics:getHeight() / 2,
+            0,
+            this.bloodShakeZoom,
+            this.bloodShakeZoom,
+            this.images.blood:getWidth() / 2,
+            this.images.blood:getHeight() / 2
+        )
+        love.graphics.setColor(255, 255, 255)
     end
 end
 
@@ -636,6 +691,8 @@ function this.draw()
     end
 
     this.map.draw()
+
+    this.drawBloodShake()
 
     if this.mode == this.constantes.modes.pause then
         -- Filtre transparent
