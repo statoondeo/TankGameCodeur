@@ -10,7 +10,11 @@ io.stdout:setvbuf("no")
 love.graphics.setDefaultFilter("nearest")
 
 -- Variable contenu les données du jeu
-game = require("modules/gameModule")
+require("modules/game")
+require("maps/mainTitle")
+
+-- Conteneur du jeu
+local game = createGame()
 
 function love.load()
     -- Changement du mode d'affichage
@@ -22,7 +26,7 @@ function love.load()
     game.load()
 
     -- Chargement du menu principal    
-    game.init(require("maps/mainTitleModule"))
+    game.init(createMainMenu(game))
 end
 
 function love.update(dt)

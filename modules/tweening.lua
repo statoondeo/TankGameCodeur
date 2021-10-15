@@ -1,6 +1,4 @@
-local this = {}
-
-function this.easingInOutCubic(x)
+function easingInOutCubic(x)
     if x < 0.5 then
         return 4 * x^3
     else
@@ -8,33 +6,33 @@ function this.easingInOutCubic(x)
     end
 end
 
-function this.easingOutCirc(x)
+function easingOutCirc(x)
     return (1 - (x - 1)^2)^0.5
 end
 
-function this.easingInExpo(x)
+function easingInExpo(x)
     return 2^(10 * x - 10)
 end
 
-function this.easingLin(x)
+function easingLin(x)
     return x
 end
 
-function this.easingOutBack(x)
+function easingOutBack(x)
     local c1 = 1.70158;
     local c3 = c1 + 1;
     
     return 1 + c3 * (x - 1)^3 + c1 * (x - 1)^2
 end
 
-function this.easeInBack(x)
+function easingInBack(x)
     local c1 = 1.70158;
     local c3 = c1 + 1;
     
     return c3 * x * x * x - c1 * x * x
 end
 
-function this.easingInOutBack(x)
+function easingInOutBack(x)
     local c1 = 1.70158
     local c2 = c1 * 1.525
     
@@ -44,5 +42,3 @@ function this.easingInOutBack(x)
         return ((2 * x - 2)^2 * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2
     end
 end
-
-return this
