@@ -35,7 +35,7 @@ function createReboundMissile(myGame, myTank, baseMissileFactory)
     myMissile.damage = {}
     myMissile.damage.missile = missileConstants.rebound.damage.missile
     myMissile.damage.explosion = missileConstants.rebound.damage.explosion
-    myMissile.explosionHitbox = createHitbox(hitboxConstants.circleType)
+    myMissile.explosionHitbox = createHitbox(myMissile.game, hitboxConstants.circleType)
     myMissile.explosionHitbox.radius = missileConstants.rebound.explosionZoom * myMissile.game.resources.images.missiles[1]:getWidth()
     myMissile.amplitudeShake = missileConstants.rebound.shake.amplitude
     myMissile.timeShake = missileConstants.rebound.shake.time

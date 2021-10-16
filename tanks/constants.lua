@@ -5,7 +5,7 @@ this.modes.player = 1
 this.modes.enemy = 2
 
 this.base = {}
-this.base.tailLife = 1
+this.base.tailLife = 2
 this.base.tailSpeed = 10
 this.base.lifeBarHeight = 6
 this.base.turretAnchorOffset = {}

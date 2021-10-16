@@ -19,7 +19,7 @@ function createBaseMissile(myGame, myTank)
     myMissile.exploded = false
     myMissile.explosionTimeLife = 0
     myMissile.outDated = false
-    myMissile.hitbox = createHitbox(hitboxConstants.circleType)
+    myMissile.hitbox = createHitbox(myMissile.game, hitboxConstants.circleType)
     myMissile.hitbox.x = myMissile.x
     myMissile.hitbox.y = myMissile.y
     myMissile.ExplosionSoundStarted = false   

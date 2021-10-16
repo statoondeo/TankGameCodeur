@@ -58,8 +58,8 @@ function createAllyTank(myGame, myTankMode, myTankSkin, x, y, angle, baseTankFac
      end
      
     myTank.initialDamage = myTank.damage
-    myTank.damage = function ()
-        myTank.initialDamage()
+    myTank.damage = function (damages)
+        myTank.initialDamage(damages)
         myTank.game.bloodShake = true
     end
     

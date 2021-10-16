@@ -1,16 +1,17 @@
 function createMap1(myGame)
+    require("maps/map2")
     local gameConstants = require("modules/constants")
     local hitboxConstants = require("modules/hitboxConstants")
     local tankConstants = require("tanks/constants")
     local turretConstants = require("turrets/constants")
+
     local myMap = {}
+
     myMap.game = myGame
     myMap.constantes = {}
 
     myMap.constantes.tiles = {}
-    myMap.constantes.tiles.size = {}
-    myMap.constantes.tiles.size.x = 64
-    myMap.constantes.tiles.size.y = 64
+
     myMap.constantes.tiles.number = {}
     myMap.constantes.tiles.number.x = 16
     myMap.constantes.tiles.number.y = 12
@@ -35,7 +36,7 @@ function createMap1(myGame)
     -- Point de départ du joueur
     myMap.start = 
     {
-        2, 9, 0 
+        2, 8, 0 
     }
 
     -- Numéro de carte
@@ -44,13 +45,13 @@ function createMap1(myGame)
     -- Liste des ennemis
     myMap.enemies = 
     {
-        { 5, 3, 2, 0 },
-        { 5, 6, 11, math.pi },
-        { 5, 15, 5, math.pi / 2 }
+        { 5, 3, 1, 0 },
+        { 5, 7, 10, math.pi },
+        { 5, 15, 4, math.pi / 2 }
     }
     myMap.goals = 
     {
-        { 15, 2, 20 }
+        { 15, 1, 20 }
     }
 
     myMap.obstacles = 
@@ -108,9 +109,10 @@ function createMap1(myGame)
         myMap.playerLoose = false
         myMap.playerDetected = false
         myMap.missionStep = 1
-        myMap.goalHitbox = createHitbox(hitboxConstants.circleType)
-        myMap.goalHitbox.x = (myMap.goals[1][1] - 0.5) * myMap.constantes.tiles.size.x
-        myMap.goalHitbox.y = (myMap.goals[1][2] - 0.5) * myMap.constantes.tiles.size.y
+        myMap.goalHitbox = createHitbox(myMap.game, hitboxConstants.circleType)
+        local point = myMap.game.GetTileCenterFromTileInMap(myMap.goals[1][2] * myMap.constantes.tiles.number.x + myMap.goals[1][1])
+        myMap.goalHitbox.x = point.x
+        myMap.goalHitbox.y = point.y
         myMap.goalHitbox.radius = myMap.goals[1][3]
         myMap.goalHitbox.angle = 0
         myMap.goals[1][4] = false
@@ -228,6 +230,12 @@ function createMap1(myGame)
 
         elseif key == "space" then
             myMap.game.switchPause()
+
+        elseif key == "w" then
+            myMap.playerWin = true
+            if myMap.game.mode ~= gameConstants.modes.initGameEnd then
+                myMap.game.mode = gameConstants.modes.initGameEnd
+            end
         end
     end
 

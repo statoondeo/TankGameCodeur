@@ -23,7 +23,7 @@ function createMiniMissile(myGame, myTank, baseMissileFactory)
     myMissile.damage = {}
     myMissile.damage.missile = missileConstants.mini.damage.missile
     myMissile.damage.explosion = missileConstants.mini.damage.explosion
-    myMissile.explosionHitbox = createHitbox(hitboxConstants.circleType)
+    myMissile.explosionHitbox = createHitbox(myMissile.game, hitboxConstants.circleType)
     myMissile.explosionHitbox.radius = missileConstants.mini.explosionZoom * myMissile.game.resources.images.missiles[1]:getWidth()
 
     myMissile.initialUpdate = myMissile.update

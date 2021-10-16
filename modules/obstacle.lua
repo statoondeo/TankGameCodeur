@@ -7,17 +7,17 @@ function createObstacle(myGame, imageIndex, x, y, angle, zoom, stopMissile, stop
     -- Impact sur les collisions
     if roundHitBox ~= nil then
         if roundHitBox == true then
-            newObstacle.hitbox = createHitbox(hitboxConstants.circleType)
+            newObstacle.hitbox = createHitbox(newObstacle.game, hitboxConstants.circleType)
             newObstacle.hitbox.radius = radius
         else
-            newObstacle.hitbox = createHitbox(hitboxConstants.rectangleType)
+            newObstacle.hitbox = createHitbox(newObstacle.game, hitboxConstants.rectangleType)
             newObstacle.hitbox.width = width
             newObstacle.hitbox.height = height
         end
         newObstacle.hitbox.x = x
         newObstacle.hitbox.y = y
     else
-        newObstacle.hitbox = createHitbox(hitboxConstants.nonetype)
+        newObstacle.hitbox = createHitbox(newObstacle.game, hitboxConstants.nonetype)
     end
 
     -- Impact sur le visuel

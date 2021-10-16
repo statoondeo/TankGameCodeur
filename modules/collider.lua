@@ -15,7 +15,7 @@ function createCollider()
         end
     end
 
-    newcollider.ManageMissileTankCollision = function (myMissile, myTank)
+    newcollider.manageMissileTankCollision = function (myMissile, myTank)
         if myMissile.tank.mode ~= myTank.mode then
             if myMissile.hitbox.IsCollision(myTank.hitbox) then
 
@@ -31,7 +31,7 @@ function createCollider()
         end
     end
 
-    newcollider.ManageExplosionTankCollision = function (myMissile, myTank)
+    newcollider.manageExplosionTankCollision = function (myMissile, myTank)
         if myMissile.tank.mode ~= myTank.mode then
 
             -- On inflige des dégats d'explosion au tank
@@ -44,7 +44,7 @@ function createCollider()
         end
     end
 
-    newcollider.ManageTankObstacleCollision = function (myTank, myObstacle)
+    newcollider.manageTankObstacleCollision = function (myTank, myObstacle)
         if myObstacle.hitbox.type ~= hitboxConstants.noneType and myObstacle.hitbox.IsCollision(myTank.hitbox) then
 
             if myObstacle.stopTank == true then
@@ -62,7 +62,7 @@ function createCollider()
         return myTank.vector.x == 0 and myTank.vector.y == 0
     end
 
-    newcollider.ManageTankTankCollision = function (myTank, myOtherTank)
+    newcollider.manageTankTankCollision = function (myTank, myOtherTank)
         if myTank.hitbox.IsCollision(myOtherTank.hitbox) then
             -- On replace le tank à l'extérieur de l'obstacle
             while myTank.rewind() and myTank.hitbox.IsCollision(myOtherTank.hitbox) do end
@@ -75,7 +75,7 @@ function createCollider()
         return myTank.vector.x == 0 and myTank.vector.y == 0
     end
 
-    newcollider.ManageTankGroundCollision = function (myTank, myObstacle)
+    newcollider.manageTankGroundCollision = function (myTank, myObstacle)
         if myObstacle.hitbox.type ~= hitboxConstants.noneType and myObstacle.hitbox.IsCollision(myTank.hitbox) then
             -- Les modificateurs de vitesse se cumulent entre eux
             myTank.speedFactor = myTank.speedFactor * myObstacle.speedRatio
@@ -91,7 +91,7 @@ function createCollider()
             if myMissile.exploded == false then
                 for i, myObstacle in ipairs(myObstacles) do
                     if myObstacle.stopMissile == true then
-                        newcollider.ManageMissileObstacleCollision(myMissile, myObstacle)
+                        newcollider.manageMissileObstacleCollision(myMissile, myObstacle)
                         if myMissile.exploded == true then
                             break
                         end
@@ -102,7 +102,7 @@ function createCollider()
             if myMissile.exploded == false then
                 -- Est-ce que le missile rencontre un tank
                 for i, myTank in ipairs(myTanks) do
-                    newcollider.ManageMissileTankCollision(myMissile, myTank)
+                    newcollider.manageMissileTankCollision(myMissile, myTank)
                     if myMissile.exploded == true then
                         break
                     end
@@ -111,7 +111,7 @@ function createCollider()
                 -- Est-ce que l'explosion rencontre un tank
                 if myMissile.explosionDamageDone == false then
                     for i, myTank in ipairs(myTanks) do
-                        newcollider.ManageExplosionTankCollision(myMissile, myTank)
+                        newcollider.manageExplosionTankCollision(myMissile, myTank)
                     end
                     myMissile.explosionDamageDone = true
                 end
@@ -132,7 +132,7 @@ function createCollider()
                 if tankStopped == false then
                     -- Est-ce que le tank rencontre un obstacle
                     for i, myObstacle in ipairs(myObstacles) do
-                        tankStopped = newcollider.ManageTankObstacleCollision(myTank, myObstacle)
+                        tankStopped = newcollider.manageTankObstacleCollision(myTank, myObstacle)
                         if tankStopped == true then
                             break
                         end
@@ -143,16 +143,15 @@ function createCollider()
                     -- Est-ce que le tank rencontre un tank
                     for i, myOtherTank in ipairs(myTanks) do
                         if myOtherTank ~= myTank then
-                            tankStopped = newcollider.ManageTankTankCollision(myOtherTank, myTank)
+                            tankStopped = newcollider.manageTankTankCollision(myTank, myOtherTank)
                         end
                     end
                 end
 
                 if tankStopped == false then
                     -- Récupération de la dalle du tank
-                    local colonne = math.floor(myTank.x / myTank.game.map.constantes.tiles.size.x) + 1 
-                    local ligne = math.floor(myTank.y / myTank.game.map.constantes.tiles.size.y) + 1  
-                    local tile = myTank.game.map.tiles[ligne * myTank.game.map.constantes.tiles.number.x + colonne]
+                    local point = myTank.game.GetTileFromCoordonates(myTank.x, myTank.y)
+                    local tile = myTank.game.map.tiles[point.x * myTank.game.map.constantes.tiles.number.x + point.y]
                     if myTank.game.map.modifiers[tile] ~= nil then
                         myTank.speedFactor = myTank.speedFactor * myTank.game.map.modifiers[tile]
                     end

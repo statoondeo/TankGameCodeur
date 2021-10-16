@@ -20,6 +20,34 @@ function createGame()
         myGame.resources.load()
     end
 
+    myGame.GetTileCenterFromTileInMap = function(tileNumber) 
+        local point = myGame.GetTileOrigineFromTileInMap(tileNumber)
+
+        point.x = point.x + 0.5 * gameConstants.tiles.size.x
+        point.y = point.y + 0.5 * gameConstants.tiles.size.y
+
+        return point
+    end
+    
+    myGame.GetTileOrigineFromTileInMap = function(tileNumber) 
+        local point = {}
+
+        point.x = ((tileNumber - 1) % myGame.map.constantes.tiles.number.x) * gameConstants.tiles.size.x
+        point.y = math.floor((tileNumber - 1) / myGame.map.constantes.tiles.number.x) * gameConstants.tiles.size.y
+
+        return point
+    end
+
+    myGame.GetTileFromCoordonates = function(x, y) 
+        local point = {}
+
+        point.x = math.floor(x / gameConstants.tiles.size.x) + 1
+        point.y = math.floor(y / gameConstants.tiles.size.y) + 1
+
+        return point
+    end
+
+
     myGame.init = function (myMap)
         -- On remet à zéro les données
         myGame.missiles = {}
@@ -55,10 +83,11 @@ function createGame()
                 -- Regarde si la tuile courante doit contenir une balises
                 if tileBeacon[tile] ~= nil then
                     -- On ajoute la balise
-                    local newBeacon = createHitbox(hitboxConstants.circleType)
+                    local newBeacon = createHitbox(myGame, hitboxConstants.circleType)
                     newBeacon.id = i
-                    newBeacon.x = math.floor((0.5 + (i - 1) % myGame.map.constantes.tiles.number.x) * myGame.map.constantes.tiles.size.x)
-                    newBeacon.y = math.floor((0.5 + math.floor((i - 1) / myGame.map.constantes.tiles.number.x)) * myGame.map.constantes.tiles.size.y)
+                    local point = myGame.GetTileCenterFromTileInMap(i)
+                    newBeacon.x = point.x
+                    newBeacon.y = point.y
                     newBeacon.radius = 32
                     newBeacon.directions = tileBeacon[tile]
                     table.insert(myGame.map.beacons, newBeacon)
@@ -84,13 +113,11 @@ function createGame()
                 myObstacle[11],
                 myObstacle[12])
             table.insert(myGame.obstacles, myNewObstacle)
-            if myNewObstacle.isVisible == true then
+            if myNewObstacle.visible == true then
                 table.insert(myGame.sprites, myNewObstacle)
-            end
+            else
 
-            -- Remplissage des zones à peupler avec des décorations
-            if myObstacle[1] == 0 then
-                -- On remplit chaque zone demandée
+                -- Remplissage des zones à peupler avec des décorations
                 local j = myObstacle[2]
                 while j < myObstacle[2] + myObstacle[11] - 16 do
                     local k = myObstacle[3]
@@ -121,22 +148,19 @@ function createGame()
         end       
 
         -- Création du tank joueur
-        local tankX
-        local tankY
+        local point
         if myGame.map.start ~= nil then
             -- Calcul de la position à partir de la tuile
-            tankX = (myGame.map.start[1] - 0.5) * myGame.map.constantes.tiles.size.x
-            tankY = (myGame.map.start[2] - 0.5) * myGame.map.constantes.tiles.size.y
-            myGame.playerTank = createTank(myMap.game, tankConstants.modes.player, myGame.map.playerSkin, tankX, tankY, myGame.map.start[3])
+            point = myMap.game.GetTileCenterFromTileInMap(myGame.map.start[2] * myMap.constantes.tiles.number.x + myGame.map.start[1])
+            myGame.playerTank = createTank(myMap.game, tankConstants.modes.player, myGame.map.playerSkin, point.x, point.y, myGame.map.start[3])
             table.insert(myGame.tanks, myGame.playerTank)
             table.insert(myGame.sprites, myGame.playerTank)
             table.insert(myGame.sprites, myGame.playerTank.turret)
         end
         -- Ennemis
         for i, enemy in ipairs(myGame.map.enemies) do
-            tankX = (enemy[2] - 0.5) * myGame.map.constantes.tiles.size.x
-            tankY = (enemy[3] - 0.5) * myGame.map.constantes.tiles.size.y
-            local enemyTank = createTank(myMap.game, tankConstants.modes.enemy, enemy[1], tankX, tankY, enemy[4])
+            point = myMap.game.GetTileCenterFromTileInMap(enemy[3] * myMap.constantes.tiles.number.x + enemy[2])
+            local enemyTank = createTank(myMap.game, tankConstants.modes.enemy, enemy[1], point.x, point.y, enemy[4])
             enemyTank.enemy = myGame.playerTank
             table.insert(myGame.tanks, enemyTank)
             table.insert(myGame.sprites, enemyTank)
@@ -176,11 +200,11 @@ function createGame()
             if camera.y < 0 then
                 camera.y = 0
             end
-            if camera.x > myGame.map.constantes.tiles.size.x * myGame.map.constantes.tiles.number.x - love.graphics:getWidth() then
-                camera.x = myGame.map.constantes.tiles.size.x * myGame.map.constantes.tiles.number.x - love.graphics:getWidth()
+            if camera.x > gameConstants.tiles.size.x * myGame.map.constantes.tiles.number.x - love.graphics:getWidth() then
+                camera.x = gameConstants.tiles.size.x * myGame.map.constantes.tiles.number.x - love.graphics:getWidth()
             end
-            if camera.y > myGame.map.constantes.tiles.size.y * myGame.map.constantes.tiles.number.y - love.graphics:getHeight() then
-                camera.y = myGame.map.constantes.tiles.size.y * myGame.map.constantes.tiles.number.y - love.graphics:getHeight()
+            if camera.y > gameConstants.tiles.size.y * myGame.map.constantes.tiles.number.y - love.graphics:getHeight() then
+                camera.y = gameConstants.tiles.size.y * myGame.map.constantes.tiles.number.y - love.graphics:getHeight()
             end
 
             -- On calcule l'offset à appliquer à tous les éléments 
@@ -203,6 +227,7 @@ function createGame()
     end
 
     myGame.update = function(dt)
+
         if myGame.mode == gameConstants.modes.init then
             myGame.initialTtl = myGame.initialTtl + dt
             myGame.map.music:setVolume(myGame.initialTtl / gameConstants.modes.ttl)
@@ -463,10 +488,11 @@ function createGame()
     myGame.draw = function ()
         -- On draw la map
         for i, tile in ipairs(myGame.map.tiles) do
+            local point = myGame.GetTileOrigineFromTileInMap(i)
             love.graphics.draw(
                 myGame.resources.images.tiles[tile], 
-                (i - 1) % myGame.map.constantes.tiles.number.x * myGame.map.constantes.tiles.size.x + myGame.offset.x, 
-                math.floor((i - 1) / myGame.map.constantes.tiles.number.x) * myGame.map.constantes.tiles.size.y + myGame.offset.y)
+                point.x + myGame.offset.x, 
+                point.y + myGame.offset.y)
         end
 
         -- On draw les sprites

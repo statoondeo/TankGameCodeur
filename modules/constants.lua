@@ -39,6 +39,11 @@ this.fonts.size.medium = 36
 this.fonts.size.large = 72
 this.fonts.size.giant = 108
 
+this.tiles = {}
+this.tiles.size = {}
+this.tiles.size.x = 64
+this.tiles.size.y = 64
+
 -- Directions proposées par les tuiles
 this.tileBeacons = 
 {

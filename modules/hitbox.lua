@@ -40,7 +40,7 @@ function createHitbox(myGame, myHitboxType)
             end
         else
             if hitboxToTest.type == hitboxConstants.circleType then
-                return newHitbox.IsCircleInRectangle(hitboxToTest)
+                return hitboxToTest.IsCircleInRectangle(newHitbox)
             else
                 return newHitbox.IsRectangleInRectangle(hitboxToTest)
             end
@@ -54,7 +54,7 @@ function createHitbox(myGame, myHitboxType)
 
     -- Est-ce qu'il y a collision entre ces 2 hitbox circulaires
     newHitbox.IsCircleInCircle = function (hitbox)
-        return this.dist(newHitbox, hitbox) <= newHitbox.radius + hitbox.radius
+        return newHitbox.dist(hitbox) <= newHitbox.radius + hitbox.radius
     end
 
     newHitbox.IsCircleInArc = function (arc)
@@ -71,23 +71,27 @@ function createHitbox(myGame, myHitboxType)
 
     -- Est-ce qu'il y a collision entre ces 2 hitbox circulaire et rectangulaire
     newHitbox.IsCircleInRectangle = function (rectangleHitBox)
-        local nHitBox = {}
+        local nHitBox = createHitbox(newHitbox.game, hitboxConstants.circleType)
         nHitBox.x = newHitbox.x + newHitbox.radius
         nHitBox.y = newHitbox.y
-        local sHitBox = {}
+        nHitBox.radius = 1
+        local sHitBox = createHitbox(newHitbox.game, hitboxConstants.circleType)
         sHitBox.x = newHitbox.x - newHitbox.radius
         sHitBox.y = newHitbox.y                
-        local eHitBox = {}
+        sHitBox.radius = 1
+        local eHitBox = createHitbox(newHitbox.game, hitboxConstants.circleType)
         eHitBox.x = newHitbox.x
         eHitBox.y = newHitbox.y - newHitbox.radius
-        local wHitBox = {}
+        eHitBox.radius = 1
+        local wHitBox = createHitbox(newHitbox.game, hitboxConstants.circleType)
         wHitBox.x = newHitbox.x
         wHitBox.y = newHitbox.y + newHitbox.radius
+        wHitBox.radius = 1
         return 
-            nHitBox.IsPointInRectangle(nHitBox, rectangleHitBox) or 
-            sHitBox.IsPointInRectangle(sHitBox, rectangleHitBox) or 
-            eHitBox.IsPointInRectangle(eHitBox, rectangleHitBox) or 
-            wHitBox.IsPointInRectangle(wHitBox, rectangleHitBox)
+            nHitBox.IsPointInRectangle(rectangleHitBox) or 
+            sHitBox.IsPointInRectangle(rectangleHitBox) or 
+            eHitBox.IsPointInRectangle(rectangleHitBox) or 
+            wHitBox.IsPointInRectangle(rectangleHitBox)
     end
 
     -- Est-ce qu'il y a collision entre ces 2 hitbox rectangulaires

@@ -30,7 +30,7 @@ function createRafaleMissile(myGame, myTank, baseMissileFactory)
     myMissile.damage = {}
     myMissile.damage.missile = missileConstants.rafale.damage.missile
     myMissile.damage.explosion = missileConstants.rafale.damage.explosion
-    myMissile.explosionHitbox = createHitbox(hitboxConstants.circleType)
+    myMissile.explosionHitbox = createHitbox(myMissile.game, hitboxConstants.circleType)
     myMissile.explosionHitbox.radius = missileConstants.rafale.explosionZoom * myMissile.game.resources.images.missiles[1]:getWidth()
     myMissile.amplitudeShake = missileConstants.rafale.shake.amplitude
     myMissile.timeShake = missileConstants.rafale.shake.time

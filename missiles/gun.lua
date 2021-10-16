@@ -35,7 +35,7 @@ function createGunMissile(myGame, myTank, baseMissileFactory)
     myMissile.damage = {}
     myMissile.damage.missile = missileConstants.gun.damage.missile
     myMissile.damage.explosion = missileConstants.gun.damage.explosion
-    myMissile.explosionHitbox = createHitbox(hitboxConstants.circleType)
+    myMissile.explosionHitbox = createHitbox(myMissile.game, hitboxConstants.circleType)
     myMissile.explosionHitbox.radius = missileConstants.gun.explosionZoom * myMissile.game.resources.images.missiles[1]:getWidth()
     myMissile.amplitudeShake = missileConstants.gun.shake.amplitude
     myMissile.timeShake = missileConstants.gun.shake.time

@@ -54,13 +54,13 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
         -- La tourelle fait la sentinelle
         newTurret.angle = (newTurret.angle + newTurret.speed * dt) % (2 * math.pi)
         -- On check si le tank allié est détecté
-        if newTurret.game.playerTank.hitbox.IsCircleInArc(newTurret.arc) == true then
-            newTurret.state = turretConstants.enemy.alert.mode
-            newTurret.game.resources.sounds.alert:stop()
-            newTurret.game.resources.sounds.alert:setPitch(1)
-            newTurret.game.resources.sounds.alert:play()
-            newTurret.arc.speed = -turretConstants.enemy.arcSpeed
-        end
+        -- if newTurret.game.playerTank.hitbox.IsCircleInArc(newTurret.arc) == true then
+        --     newTurret.state = turretConstants.enemy.alert.mode
+        --     newTurret.game.resources.sounds.alert:stop()
+        --     newTurret.game.resources.sounds.alert:setPitch(1)
+        --     newTurret.game.resources.sounds.alert:play()
+        --     newTurret.arc.speed = -turretConstants.enemy.arcSpeed
+        -- end
     end
 
     newTurret.executeAlert = function (dt)
@@ -92,7 +92,7 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
         newTurret.stateTtl = newTurret.stateTtl - dt
         if newTurret.stateTtl <= 0 then
             -- On checke si le joueur est toujours ici
-            if newTurret.game.hitbox.IsCircleInArc(newTurret.game.playerTank.hitbox, newTurret.arc) == true then
+            if newTurret.game.playerTank.hitbox.IsCircleInArc(newTurret.arc) == true then
                 newTurret.stateTtl = turretConstants.enemy.attack.ttl
             else
                 newTurret.state = turretConstants.enemy.alert.mode 

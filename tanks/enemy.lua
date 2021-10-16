@@ -28,81 +28,81 @@ function createEnemyTank(myGame, myTankMode, myTankSkin, x, y, angle, baseTankFa
     myTank.initialUpdate = myTank.update
     myTank.update = function (dt)
         myTank.initialUpdate(dt)
-        -- Est-ce que le tank rencontre une balise directionnelle?
-        local myTankHitbox = createHitbox(hitboxConstants.circleType)
-        myTankHitbox.x = myTank.hitbox.x
-        myTankHitbox.y = myTank.hitbox.y
-        myTankHitbox.radius = 2
-        for i, myBeacon in ipairs(myTank.game.map.beacons) do
-            -- Préparation à la rencontre avec une balise
-            if myTank.hitbox.IsCollision(myBeacon) and myBeacon.id ~= myTank.lastBeacon and myTank.state ~= tankConstants.enemy.states.moveStop then
-                myTank.state = tankConstants.enemy.states.moveStop
+        if myTank.outDated == false then
+            for i, myBeacon in ipairs(myTank.game.map.beacons) do
 
-                -- tank pris en charge par la balise
-                myTank.beaconTtl = 0
-                myTank.beacon = myBeacon
-                myTank.beaconX = myTank.x
-                myTank.beaconDistX = myBeacon.x - myTank.x
-                myTank.beaconY = myTank.y
-                myTank.beaconDistY = myBeacon.y - myTank.y
-            end
-        end
-    
-        myTank.checkTtl = myTank.checkTtl - dt
-        if myTank.checkTtl <= 0 then
-            local collision
-            --Est-ce que le tank rencontre un tank
-            for i, myOtherTank in ipairs(myTank.game.tanks) do
-                if myOtherTank ~= myTank then
-                    collision = myTank.hitbox.IsCollision(myOtherTank.hitbox)
-                    if collision == true then
-                        break
-                    end
+                -- Est-ce que le tank rencontre une balise directionnelle?
+                if myTank.hitbox.IsCollision(myBeacon) and 
+                        myBeacon.id ~= myTank.lastBeacon and 
+                        myTank.state ~= tankConstants.enemy.states.moveStop then
+
+                    -- tank pris en charge par la balise
+                    myTank.state = tankConstants.enemy.states.moveStop
+                    myTank.beaconTtl = 0
+                    myTank.beacon = myBeacon
+                    myTank.beaconX = myTank.x
+                    myTank.beaconDistX = myBeacon.x - myTank.x
+                    myTank.beaconY = myTank.y
+                    myTank.beaconDistY = myBeacon.y - myTank.y
                 end
             end
-    
-            if collision == false then
-                --Est-ce que le tank rencontre un obstacle
-                for i, myObstacle in ipairs(myTank.game.obstacles) do
-                    if myObstacle.stopTank == true then
-                        collision = myTank.hitbox.IsCollision(myObstacle.hitbox)
+        
+            myTank.checkTtl = myTank.checkTtl - dt
+            if myTank.checkTtl <= 0 then
+                local collision
+                --Est-ce que le tank rencontre un tank
+                for i, myOtherTank in ipairs(myTank.game.tanks) do
+                    if myOtherTank ~= myTank then
+                        collision = myTank.hitbox.IsCollision(myOtherTank.hitbox)
                         if collision == true then
                             break
                         end
                     end
                 end
+        
+                if collision == false then
+                    --Est-ce que le tank rencontre un obstacle
+                    for i, myObstacle in ipairs(myTank.game.obstacles) do
+                        if myObstacle.stopTank == true then
+                            collision = myTank.hitbox.IsCollision(myObstacle.hitbox)
+                            if collision == true then
+                                break
+                            end
+                        end
+                    end
+                end
+        
+                -- dans ce cas il fait demi tour
+                if collision == true then
+                    myTank.state = tankConstants.enemy.states.moveBack
+                    myTank.lastBeacon = 0
+                    myTank.checkTtl = tankConstants.enemy.states.checkTtl
+                end
             end
-    
-            -- dans ce cas il fait demi tour
-            if collision == true then
-                myTank.state = tankConstants.enemy.states.moveBack
-                myTank.lastBeacon = 0
-                myTank.checkTtl = tankConstants.enemy.states.checkTtl
+        
+            -- Comportement par état
+            if myTank.state == tankConstants.enemy.states.goAhead then
+                myTank.moveAheadState(dt)
+            elseif myTank.state == tankConstants.enemy.states.moveUp then
+                myTank.moveUpState(dt)
+            elseif myTank.state == tankConstants.enemy.states.moveRight then
+                myTank.moveRightState(dt)
+            elseif myTank.state == tankConstants.enemy.states.moveDown then
+                myTank.moveDownState(dt)
+            elseif myTank.state == tankConstants.enemy.states.moveLeft then
+                myTank.moveLeftState(dt)
+            elseif myTank.state == tankConstants.enemy.states.moveStop then
+                myTank.moveStopState(dt)
+            elseif myTank.state == tankConstants.enemy.states.moveBack then
+                myTank.moveBackState(dt)
             end
-        end
-    
-        -- Comportement par état
-        if myTank.state == tankConstants.enemy.states.goAhead then
-            myTank.moveAheadState(dt)
-        elseif myTank.state == tankConstants.enemy.states.moveUp then
-            myTank.moveUpState(dt)
-        elseif myTank.state == tankConstants.enemy.states.moveRight then
-            myTank.moveRightState(dt)
-        elseif myTank.state == tankConstants.enemy.states.moveDown then
-            myTank.moveDownState(dt)
-        elseif myTank.state == tankConstants.enemy.states.moveLeft then
-            myTank.moveLeftState(dt)
-        elseif myTank.state == tankConstants.enemy.states.moveStop then
-            myTank.moveStopState(dt)
-        elseif myTank.state == tankConstants.enemy.states.moveBack then
-            myTank.moveBackState(dt)
         end
     end
 
     myTank.initialDamage = myTank.damage
     myTank.damage = function (damages)
-        myTank.initialDamage()
-        myTank.turret.damage(myTank.turret, damages)
+        myTank.initialDamage(damages)
+        myTank.turret.damage(damages)
     end
     
     myTank.moveAheadState = function (dt)
@@ -178,8 +178,11 @@ function createEnemyTank(myGame, myTankMode, myTankSkin, x, y, angle, baseTankFa
     
     myTank.initialFire = myTank.fire
     myTank.fire = function (myMissile)
-        myTank.lastShot = myTank.lastShot * 2
+        local previousFire = myTank.isFired
         myTank.initialFire()
+        if previousFire ~= myTank.isFired then
+            myTank.lastShot = myTank.lastShot * 2
+        end
     end
 
     return myTank

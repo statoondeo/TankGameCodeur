@@ -31,7 +31,7 @@ function createBasetank(myGame, myTankMode, myTankSkin, x, y, angle)
     myTank.turretAnchor.y = myTank.y
     myTank.tailFrame = 0
     myTank.tails = {}
-    myTank.hitbox = createHitbox(hitboxConstants.circleType)
+    myTank.hitbox = createHitbox(myTank.game, hitboxConstants.circleType)
     myTank.hitbox.x = myTank.x
     myTank.hitbox.y = myTank.y
     myTank.hitbox.radius = myTank.imageTank:getWidth() / 2
@@ -90,10 +90,11 @@ function createBasetank(myGame, myTankMode, myTankSkin, x, y, angle)
         myTank.UpdateTurretAnchor(dt)
 
         -- Temps de recharge des obus
-        if myTank.lastShot >= 0 then
+        if myTank.lastShot > 0 then
             myTank.lastShot = myTank.lastShot - dt
         else
             myTank.isFired = false
+            myTank.lastShot = 0
         end
     end
 
@@ -115,14 +116,15 @@ function createBasetank(myGame, myTankMode, myTankSkin, x, y, angle)
             myTank.y = myTank.y - myTank.vector.y
             myTank.hitbox.x = myTank.x
             myTank.hitbox.y = myTank.y
+            return myTank.vector.x ~= 0 or myTank.vector.y ~= 0
         end
-        return myTank.vector.x ~= 0 or myTank.vector.x ~= 0
+        return false
     end
 
     myTank.drawTails = function()
         -- Affichage des traces du tank
         for i, myTail in ipairs(myTank.tails) do
-            myTank.drawtail(myTank, myTail)
+            myTank.drawtail(myTail)
         end
         love.graphics.setColor(255, 255, 255)
     end

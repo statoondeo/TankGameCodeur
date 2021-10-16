@@ -76,6 +76,7 @@ function createResourceLoader()
         resourceLoader.images.bonus = love.graphics.newImage("images/bonus_1.png")
         resourceLoader.images.cross = love.graphics.newImage("images/cross.png")
         resourceLoader.images.blood = love.graphics.newImage("images/blood.png")
+        resourceLoader.images.crosshair = love.graphics.newImage("images/crosshair2.png")
 
         -- Curseurs
         resourceLoader.images.cursor = love.mouse.newCursor("images/crosshair.png", 0, 0)

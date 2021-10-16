@@ -1,16 +1,16 @@
 function createMap2(myGame)
+    local gameConstants = require("modules/constants")
     local hitboxConstants = require("modules/hitboxConstants")
     local tankConstants = require("tanks/constants")
     local turretConstants = require("turrets/constants")
+
     local myMap = {}
+
     myMap.game = myGame
 
     myMap.constantes = {}
 
     myMap.constantes.tiles = {}
-    myMap.constantes.tiles.size = {}
-    myMap.constantes.tiles.size.x = 64
-    myMap.constantes.tiles.size.y = 64
     myMap.constantes.tiles.number = {}
     myMap.constantes.tiles.number.x = 24
     myMap.constantes.tiles.number.y = 12
@@ -41,21 +41,21 @@ function createMap2(myGame)
     -- Liste des ennemis
     myMap.enemies = 
     {
-        { 5, 7, 2, 0 },
-        { 5, 7, 11, math.pi },
-        { 5, 19, 2, 0 },
-        { 5, 19, 11, math.pi },
-        { 6, 22, 6, math.pi / 2 },
+        { 5, 6, 1, 0 },
+        { 5, 6, 10, math.pi },
+        { 5, 18, 1, 0 },
+        { 5, 18, 10, math.pi },
+        { 6, 22, 5, math.pi / 2 },
     }
 
     -- Bornes de la carte
-    myMap.rightBound = myMap.constantes.tiles.number.x * myMap.constantes.tiles.size.x
-    myMap.bottomBound = myMap.constantes.tiles.number.y * myMap.constantes.tiles.size.y
+    myMap.rightBound = myMap.constantes.tiles.number.x * gameConstants.tiles.size.x
+    myMap.bottomBound = myMap.constantes.tiles.number.y * gameConstants.tiles.size.y
     myMap.goals1 = 
     {
-        { 12, 8, 20, true },
-        { 18, 1, 20, true },
-        { 6, 12, 20, true }
+        { 12, 7, 20, true },
+        { 18, 0, 20, true },
+        { 6, 11, 20, true }
     }
     myMap.goals2 = 
     {
@@ -139,22 +139,26 @@ function createMap2(myGame)
         myMap.angle = 0
         myMap.goalAchieved = 0
         myMap.goalHitbox = {}
-        myMap.goals = myMap.goals1
-        for i = 1, #myMap.goals do
-            local goalHitbox = createHitbox(hitboxConstants.circleType)
-            goalHitbox.x = (myMap.goals[i][1] - 0.5) * myMap.constantes.tiles.size.x
-            goalHitbox.y = (myMap.goals[i][2] - 0.5) * myMap.constantes.tiles.size.y
-            goalHitbox.radius = myMap.goals[i][3]
-            goalHitbox.achieved = false
-            goalHitbox.bonus = myMap.goals[i][4]
-            table.insert(myMap.goalHitbox, goalHitbox)
-        end
+        myMap.createGoals(myMap.goals1)
         myMap.music:setLooping(true)
         myMap.music:play()
     end
 
     myMap.endInit = function ()
         myMap.game.displayGameMessage({"Mission", "Find and get the 3 ammo stocks", "Don't get detected"})
+    end
+
+    myMap.createGoals = function (myGoals)
+        for i, myGoal in ipairs(myGoals) do
+            local goalHitbox = createHitbox(myMap.game, hitboxConstants.circleType)
+            local point = myMap.game.GetTileCenterFromTileInMap(myGoal[2] * myMap.constantes.tiles.number.x + myGoal[1])
+            goalHitbox.x = point.x
+            goalHitbox.y = point.y
+            goalHitbox.radius = myGoal[3]
+            goalHitbox.achieved = false
+            goalHitbox.bonus = myGoal[4]
+            table.insert(myMap.goalHitbox, goalHitbox)
+        end
     end
 
     myMap.CheckPlayerWin = function ()
@@ -173,16 +177,7 @@ function createMap2(myGame)
             if allGoalAchieved == true then
                 myMap.missionStep = 2
                 myMap.goalHitbox = {}
-                myMap.goals = myMap.goals2
-                for i = 1, #myMap.goals do
-                    local goalHitbox = createHitbox(hitboxConstants.circleType)
-                    goalHitbox.x = (myMap.goals[i][1] - 0.5) * myMap.constantes.tiles.size.x
-                    goalHitbox.y = (myMap.goals[i][2] - 0.5) * myMap.constantes.tiles.size.y
-                    goalHitbox.radius = myMap.goals[i][3]
-                    goalHitbox.achieved = false
-                    goalHitbox.bonus = myMap.goals[i][4]
-                    table.insert(myMap.goalHitbox, goalHitbox)
-                end
+                myMap.createGoals(myMap.goals2)
                 myMap.game.displayGameMessage({"Mission update", "Get back to start to escape", "Stay alive"})
             end
 
@@ -245,14 +240,14 @@ function createMap2(myGame)
         myMap.playerLoose = myMap.CheckPlayerLoose()
         
         if myMap.playerWin == true then
-            myMap.game.mode = myMap.game.constantes.modes.initGameEnd
+            myMap.game.mode = gameConstants.modes.initGameEnd
         elseif myMap.playerLoose == true then
-            myMap.game.mode = myMap.game.constantes.modes.initGameEnd
+            myMap.game.mode = gameConstants.modes.initGameEnd
         end
     end
 
     myMap.draw = function ()
-        love.graphics.setFont(myMap.game.fonts.small)
+        love.graphics.setFont(myMap.game.resources.fonts.small)
         local font = love.graphics.getFont()
         local label
         if myMap.missionStep == 1 then
@@ -266,21 +261,21 @@ function createMap2(myGame)
 
         for i, myGoal in ipairs(myMap.goalHitbox) do
             if myGoal.achieved == false then
+                local asset = nil
                 if myGoal.bonus == true then
-                    love.graphics.draw(
-                        myMap.game.resources.images.bonus, 
-                        myGoal.x + myMap.game.offset.x, 
-                        myGoal.y + myMap.game.offset.y, 
-                        myMap.angle, 
-                        1, 
-                        1, 
-                        myMap.game.resources.images.bonus:getWidth() / 2, 
-                        myMap.game.resources.images.bonus:getHeight() / 2)
+                    asset = myMap.game.resources.images.bonus
                 else
-                    love.graphics.setColor(0, 255, 123, 0.75)
-                    love.graphics.circle("fill", myGoal.x + myMap.game.offset.x, myGoal.x + myMap.game.offset.y, myGoal.radius)
-                    love.graphics.setColor(255, 255, 255)
+                    asset = myMap.game.resources.images.crosshair
                 end
+                love.graphics.draw(
+                    asset, 
+                    myGoal.x + myMap.game.offset.x, 
+                    myGoal.y + myMap.game.offset.y, 
+                    myMap.angle, 
+                    1, 
+                    1, 
+                    asset:getWidth() / 2, 
+                    asset:getHeight() / 2)
             end
         end
     end
