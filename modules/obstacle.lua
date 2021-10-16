@@ -4,6 +4,7 @@ function createObstacle(myGame, imageIndex, x, y, angle, zoom, stopMissile, stop
     local hitboxConstants = require("modules/hitboxConstants")
     local newObstacle = {}
     newObstacle.game = myGame
+    newObstacle.type = "obstacle"
     -- Impact sur les collisions
     if roundHitBox ~= nil then
         if roundHitBox == true then

@@ -7,7 +7,10 @@ require("missiles/rebound")
 function createBaseMissile(myGame, myTank)
     local hitboxConstants = require("modules/hitboxConstants")
     local gameConstants = require("modules/constants")
+    local missileConstants = require("missiles/constants")
+
     local myMissile = {}
+    myMissile.type = "missile"
     myMissile.game = myGame    
     myMissile.baseMissileFactory = createBaseMissile    
     myMissile.tank = myTank
@@ -104,7 +107,7 @@ function createBaseMissile(myGame, myTank)
         end
 
         -- On avance dans l'animation de l'explosion du missile
-        myMissile.explosionTimeLife = myMissile.explosionTimeLife + gameConstants.explosion.speed * dt
+        myMissile.explosionTimeLife = myMissile.explosionTimeLife + missileConstants.explosion.speed * dt
 
         -- Est-ce que le missile doit disparaitre (animation d'explosion terminée)
         myMissile.explosionImageIndex = math.floor(myMissile.explosionTimeLife) + 1

@@ -295,7 +295,7 @@ function createMap2(myGame)
             end
 
         elseif key == "space" then
-            myMap.game.switchPause()
+            myMap.game.switchPausefunction()
         end
     end
 

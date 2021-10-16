@@ -5,7 +5,7 @@ function createEnemyTank(myGame, myTankMode, myTankSkin, x, y, angle, baseTankFa
     local missileConstants = require("missiles/constants")
     local myTank = baseTankFactory(myGame, myTankMode, myTankSkin, x, y, angle)
 
-    myTank.maxSpeedLimit = tankConstants.enemy.maxSpeed
+    myTank.maxSpeedLimit = tankConstants.enemy.maxSpeed * love.math.random(0.8, 1.2)
     myTank.maxSpeed = myTank.maxSpeedLimit
     myTank.acceleration = tankConstants.enemy.acceleration
     myTank.module = tankConstants
@@ -69,9 +69,14 @@ function createEnemyTank(myGame, myTankMode, myTankSkin, x, y, angle, baseTankFa
         if myTank.checkTtl <= 0 then
 
             --Est-ce que le tank rencontre un tank
+            -- On teste avec une plus grande hitbox pour anticiper les collisions
+            local newHitbox = createHitbox(myTank.game, hitboxConstants.circleType)
+            newHitbox.x = myTank.hitbox.x
+            newHitbox.y = myTank.hitbox.y
+            newHitbox.radius = myTank.hitbox.radius * 3
             for i, myOtherTank in ipairs(myTank.game.tanks) do
                 if myOtherTank ~= myTank then
-                    if myTank.hitbox.IsCollision(myOtherTank.hitbox) == true then
+                    if newHitbox.IsCollision(myOtherTank.hitbox) == true then
 
                         -- dans ce cas il fait demi tour
                         myTank.doState = myTank.moveBackState

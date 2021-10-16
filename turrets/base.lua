@@ -15,6 +15,7 @@ function createBaseTurret(myGame, myTurretSkin, myTank)
     local turretConstants = require("turrets/constants")
     local newTurret = {}
     newTurret.game = myGame
+    newTurret.type = "turret"
     newTurret.skin = myTurretSkin
     newTurret.image = newTurret.game.resources.images.turrets[newTurret.skin]
     newTurret.tank = myTank

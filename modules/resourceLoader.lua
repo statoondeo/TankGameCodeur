@@ -51,17 +51,17 @@ function createResourceLoader()
         end  
 
         -- Missiles
-        for i = 1, gameConstants.missile.frame do
+        for i = 1, missileConstants.base.frame do
             resourceLoader.images.missiles[i] = love.graphics.newImage("images/missile_" .. i .. ".png")
         end
 
         -- Explosion
-        for i = 1, gameConstants.explosion.frame do
+        for i = 1, missileConstants.explosion.frame do
             resourceLoader.images.explosions[i] = love.graphics.newImage("images/explosion_" .. i .. ".png")
         end
 
         -- tirs
-        for i = 1, gameConstants.missile.fire.frame do
+        for i = 1, missileConstants.base.fire.frame do
             resourceLoader.images.fires[i] = love.graphics.newImage("images/shot_" .. i .. ".png")
         end
 

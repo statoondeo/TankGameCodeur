@@ -20,17 +20,6 @@ this.modes.messageTtl = 2
 this.obstacle = {}
 this.obstacle.nbObstacleResource = 12
 
--- Explosion
-this.explosion = {}
-this.explosion.speed = 12
-this.explosion.frame = 5
-
--- Missiles
-this.missile = {}
-this.missile.frame = 3
-this.missile.fire = {}
-this.missile.fire.frame = 4
-
 this.fonts = {}
 this.fonts.size = {}
 this.fonts.size.tiny = 9

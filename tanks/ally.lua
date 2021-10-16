@@ -70,6 +70,7 @@ function createAllyTank(myGame, myTankMode, myTankSkin, x, y, angle, baseTankFac
             myTank.game.fireShake = true
             myTank.game.amplitudeShake = myMissile.amplitudeShake
             myTank.game.fireShakeTtl = myMissile.timeShake
+            myTank.game.fireShakeAngle = (myTank.turret.angle + math.pi) % (2 * math.pi)
         end
     end
 

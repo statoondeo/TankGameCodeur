@@ -162,6 +162,8 @@ function createGame()
             point = myMap.game.GetTileCenterFromTileInMap(enemy[3] * myMap.constantes.tiles.number.x + enemy[2])
             local enemyTank = createTank(myMap.game, tankConstants.modes.enemy, enemy[1], point.x, point.y, enemy[4])
             enemyTank.enemy = myGame.playerTank
+            enemyTank.update(0)
+            enemyTank.turret.update(0)
             table.insert(myGame.tanks, enemyTank)
             table.insert(myGame.sprites, enemyTank)
             table.insert(myGame.sprites, enemyTank.turret)
@@ -186,48 +188,52 @@ function createGame()
     end
 
     myGame.updateCamera = function (dt)
-        if myGame.playerTank ~= nil then
-            local camera = {}
+        local point = {}
+        if myGame.playerTank == nil then
+            point.x = love.graphics:getWidth() / 2
+            point.y = love.graphics:getHeight() / 2
+        else
+            point.x = myGame.playerTank.x
+            point.y = myGame.playerTank.y
+        end
+        local camera = {}
 
-            -- On centre la caméra sur le joueur
-            camera.x = myGame.playerTank.x - love.graphics:getWidth() / 2
-            camera.y = myGame.playerTank.y - love.graphics:getHeight() / 2
+        -- On centre la caméra sur le joueur
+        camera.x = point.x - love.graphics:getWidth() / 2
+        camera.y = point.y - love.graphics:getHeight() / 2
 
-            -- Si la caméra déborde de la map on la recadre
-            if camera.x < 0 then
-                camera.x = 0
-            end
-            if camera.y < 0 then
-                camera.y = 0
-            end
-            if camera.x > gameConstants.tiles.size.x * myGame.map.constantes.tiles.number.x - love.graphics:getWidth() then
-                camera.x = gameConstants.tiles.size.x * myGame.map.constantes.tiles.number.x - love.graphics:getWidth()
-            end
-            if camera.y > gameConstants.tiles.size.y * myGame.map.constantes.tiles.number.y - love.graphics:getHeight() then
-                camera.y = gameConstants.tiles.size.y * myGame.map.constantes.tiles.number.y - love.graphics:getHeight()
-            end
+        -- Si la caméra déborde de la map on la recadre
+        if camera.x < 0 then
+            camera.x = 0
+        end
+        if camera.y < 0 then
+            camera.y = 0
+        end
+        if camera.x > gameConstants.tiles.size.x * myGame.map.constantes.tiles.number.x - love.graphics:getWidth() then
+            camera.x = gameConstants.tiles.size.x * myGame.map.constantes.tiles.number.x - love.graphics:getWidth()
+        end
+        if camera.y > gameConstants.tiles.size.y * myGame.map.constantes.tiles.number.y - love.graphics:getHeight() then
+            camera.y = gameConstants.tiles.size.y * myGame.map.constantes.tiles.number.y - love.graphics:getHeight()
+        end
 
-            -- On calcule l'offset à appliquer à tous les éléments 
-            myGame.offset.x = -camera.x
-            myGame.offset.y = -camera.y
+        -- On calcule l'offset à appliquer à tous les éléments 
+        myGame.offset.x = -camera.x
+        myGame.offset.y = -camera.y
 
-            -- Le tank joueur tire on secoue l'écran
-            if myGame.fireShake == true then
-                myGame.fireShakeTtl = myGame.fireShakeTtl - dt
-                if myGame.fireShakeTtl >= 0 then
-                    myGame.offset.x = myGame.offset.x + myGame.amplitudeShake * math.cos(myGame.playerTank.turret.angle + math.pi) * easingInOutBack(myGame.fireShakeTtl / myGame.fireShakeMaxTtl)
-                    myGame.offset.y = myGame.offset.y + myGame.amplitudeShake * math.sin(myGame.playerTank.turret.angle + math.pi) * easingInOutBack(myGame.fireShakeTtl / myGame.fireShakeMaxTtl)
-                else
-                    myGame.fireShake = false
-                    myGame.fireShakeTtl = myGame.fireShakeMaxTtl
-                end
+        -- Le tank joueur tire on secoue l'écran
+        if myGame.fireShake == true then
+            myGame.fireShakeTtl = myGame.fireShakeTtl - dt
+            if myGame.fireShakeTtl >= 0 then
+                myGame.offset.x = myGame.offset.x + myGame.amplitudeShake * math.cos(myGame.fireShakeAngle) * easingInOutBack(myGame.fireShakeTtl / myGame.fireShakeMaxTtl)
+                myGame.offset.y = myGame.offset.y + myGame.amplitudeShake * math.sin(myGame.fireShakeAngle) * easingInOutBack(myGame.fireShakeTtl / myGame.fireShakeMaxTtl)
+            else
+                myGame.fireShake = false
+                myGame.fireShakeTtl = myGame.fireShakeMaxTtl
             end
-
         end
     end
 
     myGame.update = function(dt)
-
         if myGame.mode == gameConstants.modes.init then
             myGame.initialTtl = myGame.initialTtl + dt
             myGame.map.music:setVolume(myGame.initialTtl / gameConstants.modes.ttl)
@@ -495,8 +501,18 @@ function createGame()
                 point.y + myGame.offset.y)
         end
 
-        -- On draw les sprites
+        -- On draw les sprites (en dehors des arbres qui passent dans une seconde phase pour être au-dessus du reste)
+        local treeList = {}
         for i, mySprite in ipairs(myGame.sprites) do
+            if mySprite.type == "obstacle" and mySprite.visible == true and mySprite.imageIndex <= 6 then
+                table.insert(treeList, mySprite)
+            else
+                mySprite.draw()
+            end
+        end
+
+        -- On draw les arbres
+        for i, mySprite in ipairs(treeList) do
             mySprite.draw()
         end
 

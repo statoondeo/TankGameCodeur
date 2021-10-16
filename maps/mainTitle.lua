@@ -72,7 +72,6 @@ function createMainMenu(myGame)
             -- On affiche le tank
             -- Mais il ne peut pas bouger
             myMap.tanks[myMap.currentTank].x = love.graphics.getWidth() / 2
-            myMap.tanks[myMap.currentTank].angle = 0
             myMap.tanks[myMap.currentTank].update(dt)
             myMap.tanks[myMap.currentTank].turret.update(dt)
         elseif myMap.selectionWip == myMap.innerConstantes.selection.modes.tank then
@@ -97,7 +96,15 @@ function createMainMenu(myGame)
     myMap.draw = function ()
         -- Filtre transparent
         love.graphics.setColor(255, 255, 255, 0.75)
-        love.graphics.draw(myMap.game.resources.images.background, 0, 0)
+        love.graphics.draw(
+            myMap.game.resources.images.background, 
+            love.graphics.getWidth() / 2 + myMap.game.offset.x, 
+            love.graphics.getHeight() / 2 + myMap.game.offset.y,
+            0,
+            1.1,
+            1.1,
+            myMap.game.resources.images.background:getWidth() / 2,
+            myMap.game.resources.images.background:getHeight() / 2)
         love.graphics.setColor(255, 255, 255)
 
         -- Titre principal
@@ -106,28 +113,28 @@ function createMainMenu(myGame)
         local label = "Tanks"
         love.graphics.print(
             label, 
-            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
-            math.floor((love.graphics.getHeight() - font:getHeight(label)) / 7))
+            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2 + myMap.game.offset.x), 
+            math.floor((love.graphics.getHeight() - font:getHeight(label)) / 7) + myMap.game.offset.y)
         love.graphics.setFont(myMap.game.resources.fonts.large)
         font = love.graphics.getFont()
         label = "Battleground"
         love.graphics.print(
             label, 
-            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
-            math.floor(2 * (love.graphics.getHeight() - font:getHeight(label)) / 7))
+            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2 + myMap.game.offset.x), 
+            math.floor(2 * (love.graphics.getHeight() - font:getHeight(label)) / 7) + myMap.game.offset.y)
 
         love.graphics.setFont(myMap.game.resources.fonts.small)
         font = love.graphics.getFont()
         label = "Raphael DUCHOSSOY (GameCodeur.fr)"
         love.graphics.print(
             label, 
-            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
-            math.floor(3 * (love.graphics.getHeight() - font:getHeight(label)) / 7))
+            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2 + myMap.game.offset.x), 
+            math.floor(3 * (love.graphics.getHeight() - font:getHeight(label)) / 7) + myMap.game.offset.y)
         label = "\"Click\" to fire, \"Arrows\" to select tank, \"Escape\" to quit"
         love.graphics.print(
             label, 
-            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
-            math.floor(6 * (love.graphics.getHeight() - font:getHeight(label)) / 7))
+            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2 + myMap.game.offset.x), 
+            math.floor(6 * (love.graphics.getHeight() - font:getHeight(label)) / 7) + myMap.game.offset.y)
 
         love.graphics.setFont(myMap.game.resources.fonts.medium)
         font = love.graphics.getFont()
@@ -135,16 +142,16 @@ function createMainMenu(myGame)
         love.graphics.setColor(255, 255, 255, easingInOutCubic(myMap.buttonStartBlinkTimer / myMap.innerConstantes.buttonStartBlinkTimerLength))
         love.graphics.print(
             label, 
-            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
-            math.floor(4 * (love.graphics.getHeight() - font:getHeight(label)) / 7))
+            math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2) + myMap.game.offset.x, 
+            math.floor(4 * (love.graphics.getHeight() - font:getHeight(label)) / 7) + myMap.game.offset.y)
         love.graphics.setColor(255, 255, 255)
 
         -- On affiche les médailles
         for i = 1, 3 do
             love.graphics.draw(
                 myMap.game.resources.images.medals[i],
-                math.floor((love.graphics:getWidth() - myMap.game.resources.images.medals[i]:getWidth()) / 7),
-                math.floor(150 + 1.5 * (i - 1) * myMap.game.resources.images.medals[i]:getHeight()),
+                math.floor((love.graphics:getWidth() - myMap.game.resources.images.medals[i]:getWidth()) / 7) + myMap.game.offset.x,
+                math.floor(150 + 1.5 * (i - 1) * myMap.game.resources.images.medals[i]:getHeight()) + myMap.game.offset.y,
                 0,
                 1 + i / 5,
                 1 + i / 5,
@@ -153,8 +160,8 @@ function createMainMenu(myGame)
             )
             love.graphics.draw(
                 myMap.game.resources.images.medals[i],
-                math.floor(6 * (love.graphics:getWidth() - myMap.game.resources.images.medals[i]:getWidth()) / 7),
-                math.floor(150 + 1.5 * (i - 1) * myMap.game.resources.images.medals[i]:getHeight()),
+                math.floor(6 * (love.graphics:getWidth() - myMap.game.resources.images.medals[i]:getWidth()) / 7) + myMap.game.offset.x,
+                math.floor(150 + 1.5 * (i - 1) * myMap.game.resources.images.medals[i]:getHeight()) + myMap.game.offset.y,
                 0,
                 1 + i / 5,
                 1 + i / 5,
@@ -169,8 +176,8 @@ function createMainMenu(myGame)
             label = myMap.tanks[myMap.currentTank].label
             love.graphics.print(
                 label, 
-                math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2), 
-                math.floor(5.4 * love.graphics.getHeight() / 7))    
+                math.floor((love.graphics.getWidth() - font:getWidth(label)) / 2) + myMap.game.offset.x, 
+                math.floor(5.4 * love.graphics.getHeight() / 7) + myMap.game.offset.y)    
         end
 
         -- On affiche les tank

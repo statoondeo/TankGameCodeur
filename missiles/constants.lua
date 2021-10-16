@@ -1,5 +1,15 @@
 local this = {}
 
+this.base = {}
+this.base.frame = 3
+this.base.fire = {}
+this.base.fire.frame = 4
+
+-- Explosion
+this.explosion = {}
+this.explosion.speed = 12
+this.explosion.frame = 5
+
 -- tir de base 
 this.mini = {}
 this.mini.mode = 1

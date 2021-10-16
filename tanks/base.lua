@@ -9,6 +9,7 @@ function createBasetank(myGame, myTankMode, myTankSkin, x, y, angle)
     local hitboxConstants = require("modules/hitboxConstants")
     local myTank = {}
     myTank.game = myGame
+    myTank.type = "tank"
     myTank.mode = myTankMode
     myTank.skin = myTankSkin
     myTank.imageTank = myTank.game.resources.images.tanks[myTankSkin - 1]
@@ -28,7 +29,7 @@ function createBasetank(myGame, myTankMode, myTankSkin, x, y, angle)
     myTank.lastShot = 0
     myTank.turretAnchor = {}
     myTank.turretAnchor.x = myTank.x + tankConstants.base.turretAnchorOffset.x
-    myTank.turretAnchor.y = myTank.y
+    myTank.turretAnchor.y = myTank.y + tankConstants.base.turretAnchorOffset.y
     myTank.tailFrame = 0
     myTank.tails = {}
     myTank.hitbox = createHitbox(myTank.game, hitboxConstants.circleType)

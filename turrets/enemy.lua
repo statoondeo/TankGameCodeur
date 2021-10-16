@@ -3,18 +3,18 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
     local turretConstants = require("turrets/constants")
     local newTurret = createBaseTurret(myGame, myTurretSkin, myTank)
     newTurret.arc = {}
-    newTurret.speed = love.math.random() * 0.8 + 0.4
+    newTurret.speed = love.math.random() * 0.7 + 0.6
     newTurret.state = turretConstants.enemy.sentinel.mode
     newTurret.angle = 0
     newTurret.stateTtl = 0
     newTurret.arc.amplitude = turretConstants.enemy.amplitude.max    
     newTurret.arc.speed = turretConstants.enemy.arcSpeed
+    newTurret.arc.radius = turretConstants.enemy.detectionRange * love.math.random(0.8, 1.2)
 
     newTurret.initSentinel = function(dt)
         -- La tourelle fait la sentinelle
         newTurret.arc.angle = newTurret.angle
         newTurret.arc.color = turretConstants.enemy.sentinel.color
-        newTurret.arc.radius = turretConstants.enemy.detectionRange
         newTurret.emote = newTurret.game.resources.images.emotes[1]
     end
 
@@ -22,7 +22,6 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
         -- La tourelle est en alerte
         newTurret.angle = math.atan2(newTurret.tank.enemy.y - newTurret.y, newTurret.tank.enemy.x - newTurret.x)
         newTurret.arc.color= turretConstants.enemy.alert.color
-        newTurret.arc.radius = turretConstants.enemy.detectionRange
         newTurret.emote = newTurret.game.resources.images.emotes[2]
     end
 
@@ -30,7 +29,6 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
         -- La tourelle attaque
         newTurret.angle = math.atan2(newTurret.tank.enemy.y - newTurret.y, newTurret.tank.enemy.x - newTurret.x)
         newTurret.arc.color = turretConstants.enemy.attack.color
-        newTurret.arc.radius = turretConstants.enemy.detectionRange
         newTurret.emote = newTurret.game.resources.images.emotes[3]
     end
 
@@ -56,7 +54,7 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
         -- On check si le tank allié est détecté
         if newTurret.game.playerTank.hitbox.IsCircleInArc(newTurret.arc) == true then
             newTurret.state = turretConstants.enemy.alert.mode
-            newTurret.game.playSound(newTurret.game.resources.sounds.validation, 1)
+            newTurret.game.playSound(newTurret.game.resources.sounds.alert, 1)
             newTurret.arc.speed = -turretConstants.enemy.arcSpeed
         end
     end
@@ -66,7 +64,7 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
             newTurret.arc.speed = -turretConstants.enemy.arcSpeed
         else
             newTurret.state = turretConstants.enemy.sentinel.mode
-            newTurret.game.playSound(newTurret.game.resources.sounds.validation, 0.75)
+            newTurret.game.playSound(newTurret.game.resources.sounds.alert, 0.75)
             newTurret.arc.speed = turretConstants.enemy.arcSpeed
         end                        
             
@@ -74,7 +72,7 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
             newTurret.state = turretConstants.enemy.sentinel.mode
         elseif newTurret.arc.amplitude <= turretConstants.enemy.amplitude.min then
             newTurret.state = turretConstants.enemy.attack.mode
-            newTurret.game.playSound(newTurret.game.resources.sounds.validation, 1.25)
+            newTurret.game.playSound(newTurret.game.resources.sounds.alert, 1.25)
             newTurret.stateTtl = turretConstants.enemy.attack.ttl
         end
     end
