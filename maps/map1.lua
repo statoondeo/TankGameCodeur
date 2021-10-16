@@ -134,7 +134,7 @@ function createMap1(myGame)
                 myMap.missionStep = 2
                 myMap.destroyedTank = 0
                 myMap.game.displayGameMessage({"Mission update", "Seek and destroy all enemy Tanks", "Stay alive"})
-                myMap.game.resources.sounds.validation:play()
+                myMap.game.playSound(myMap.game.resources.sounds.validation, 1)
             end
         elseif myMap.missionStep == 2 then
             myMap.destroyedTank = 0
@@ -231,11 +231,6 @@ function createMap1(myGame)
         elseif key == "space" then
             myMap.game.switchPause()
 
-        elseif key == "w" then
-            myMap.playerWin = true
-            if myMap.game.mode ~= gameConstants.modes.initGameEnd then
-                myMap.game.mode = gameConstants.modes.initGameEnd
-            end
         end
     end
 

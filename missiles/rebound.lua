@@ -52,8 +52,8 @@ function createReboundMissile(myGame, myTank, baseMissileFactory)
         newMissile.initialy = myMissile.y
         newMissile.hitbox.x = newMissile.initialx
         newMissile.hitbox.y = newMissile.initialy
-        myMissile.damage.missile = missileConstants.rebound.childDamage
-        myMissile.damage.explosion = missileConstants.rebound.childDamage / 2
+        newMissile.damage.missile = missileConstants.rebound.childDamage
+        newMissile.damage.explosion = missileConstants.rebound.childDamage / 2
     end
 
 
@@ -73,7 +73,8 @@ function createReboundMissile(myGame, myTank, baseMissileFactory)
     myMissile.initialdraw = myMissile.draw    
     myMissile.draw = function ()
         myMissile.initialdraw()
-        love.graphics.draw(
+        if myMissile.exploded == false then
+            love.graphics.draw(
             myMissile.rocketImage, 
             math.floor(myMissile.x + myMissile.game.offset.x), 
             math.floor(myMissile.y + myMissile.game.offset.y), 
@@ -82,6 +83,7 @@ function createReboundMissile(myGame, myTank, baseMissileFactory)
             1, 
             0, 
             math.floor(myMissile.rocketImage:getHeight() / 2))
+        end
     end
 
     return myMissile

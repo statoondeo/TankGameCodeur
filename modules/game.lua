@@ -301,7 +301,7 @@ function createGame()
             if myGame.initialTtl > gameConstants.modes.ttl then
                 myGame.initialTtl = 0
                 myGame.mode = gameConstants.modes.gameEnd
-                myGame.resources.sounds.validation:play()
+                myGame.playSound(myGame.resources.sounds.validation, 1)
                 myGame.map.music:stop()
             end
         elseif myGame.mode == gameConstants.modes.gameEnd then
@@ -576,8 +576,14 @@ function createGame()
         end
     end
 
+    myGame.playSound = function (sound, pitch)
+        sound:stop()
+        sound:setPitch(pitch)
+        sound:play()
+    end
+    
     myGame.displayGameMessage = function (label)
-        myGame.resources.sounds.validation:play()
+        myGame.playSound(myGame.resources.sounds.validation, 1)
         myGame.mode = gameConstants.modes.initMessage
         myGame.message = label
         myGame.initialTtl = 0
@@ -592,7 +598,7 @@ function createGame()
     end
 
     myGame.switchPausefunction = function()
-        myGame.resources.sounds.validation:play()
+        myGame.playSound(myGame.resources.sounds.validation, 1)
         if myGame.mode == gameConstants.modes.pause then
             myGame.mode = gameConstants.modes.quitpause
         elseif myGame.mode == gameConstants.modes.game then
@@ -621,11 +627,6 @@ function createGame()
             if myGame.mode == gameConstants.modes.message then
                 myGame.mode = gameConstants.modes.quitMessage
             end
-
-        elseif key == "b" then
-            -- TODO : A retirer
-            -- Touche pour tester la tache de sang
-            game.bloodShake = true        
 
         end
         myGame.map.keypressed(key, scancode, isrepeat)

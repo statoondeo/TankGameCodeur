@@ -214,14 +214,14 @@ function createMainMenu(myGame)
                     myMap.tanks[myMap.currentTank].initialx = -100
                     myMap.selectionDirection = 1
                 end
-                myMap.game.resources.sounds.switch:play()
+                myMap.game.playSound(myMap.game.resources.sounds.switch, 1)
 
             elseif key == "return" then
-                myMap.game.resources.sounds.validation:play()
+                myMap.game.playSound(myMap.game.resources.sounds.validation, 1)
                 myMap.game.changeScreen(myMap.game.loadmap, createMap1(myMap.game), myMap.tanks[myMap.currentTank].skin) 
 
             elseif key == "escape" then
-                myMap.game.resources.sounds.validation:play()
+                myMap.game.playSound(myMap.game.resources.sounds.validation, 1)
                 myMap.game.changeScreen(myMap.game.quitApp) 
             end
         end

@@ -187,7 +187,7 @@ function createBasetank(myGame, myTankMode, myTankSkin, x, y, angle)
         if myTank.lastShot <= 0 then
             local myMissile = createMissile(myTank.game, myTank, myTank.missileMode)
             myTank.lastShot = myMissile.reload
-            myTank.fire(myMissile)
+            -- myTank.fire(myMissile)
             myTank.isFired = true
             return myMissile
         end

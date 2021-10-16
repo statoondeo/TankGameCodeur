@@ -56,9 +56,7 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
         -- On check si le tank allié est détecté
         if newTurret.game.playerTank.hitbox.IsCircleInArc(newTurret.arc) == true then
             newTurret.state = turretConstants.enemy.alert.mode
-            newTurret.game.resources.sounds.alert:stop()
-            newTurret.game.resources.sounds.alert:setPitch(1)
-            newTurret.game.resources.sounds.alert:play()
+            newTurret.game.playSound(newTurret.game.resources.sounds.validation, 1)
             newTurret.arc.speed = -turretConstants.enemy.arcSpeed
         end
     end
@@ -68,9 +66,7 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
             newTurret.arc.speed = -turretConstants.enemy.arcSpeed
         else
             newTurret.state = turretConstants.enemy.sentinel.mode
-            newTurret.game.resources.sounds.alert:stop()
-            newTurret.game.resources.sounds.alert:setPitch(0.75)
-            newTurret.game.resources.sounds.alert:play()
+            newTurret.game.playSound(newTurret.game.resources.sounds.validation, 0.75)
             newTurret.arc.speed = turretConstants.enemy.arcSpeed
         end                        
             
@@ -78,9 +74,7 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
             newTurret.state = turretConstants.enemy.sentinel.mode
         elseif newTurret.arc.amplitude <= turretConstants.enemy.amplitude.min then
             newTurret.state = turretConstants.enemy.attack.mode
-            newTurret.game.resources.sounds.alert:stop()
-            newTurret.game.resources.sounds.alert:setPitch(1.25)
-            newTurret.game.resources.sounds.alert:play()
+            newTurret.game.playSound(newTurret.game.resources.sounds.validation, 1.25)
             newTurret.stateTtl = turretConstants.enemy.attack.ttl
         end
     end

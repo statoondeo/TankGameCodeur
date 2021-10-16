@@ -170,7 +170,7 @@ function createMap2(myGame)
                 if myGoal.achieved == false and myMap.game.playerTank.hitbox.IsCollision(myGoal) == true then
                     myGoal.achieved = true
                     myMap.goalAchieved = myMap.goalAchieved + 1
-                    myMap.game.resources.sounds.validation:play()
+                    myMap.game.playSound(myMap.game.resources.sounds.validation, 1)
                 end
                 allGoalAchieved = allGoalAchieved and myGoal.achieved
             end
@@ -184,7 +184,7 @@ function createMap2(myGame)
         elseif myMap.missionStep == 2 then
             if myMap.game.playerTank.hitbox.IsCollision(myMap.goalHitbox[1]) == true then
                 myMap.goalHitbox[1].achieved = true
-                myMap.game.resources.sounds.validation:play()
+                myMap.game.playSound(myMap.game.resources.sounds.validation, 1)
             end
             win = myMap.goalHitbox[1].achieved
             if win == true then

@@ -32,17 +32,13 @@ function createBaseMissile(myGame, myTank)
 
     myMissile.updateFireSound = function (dt)
         -- Son d'explosion du missile si pas encore fait
-        myMissile.game.resources.sounds.shots[1]:stop()
-        myMissile.game.resources.sounds.shots[1]:setPitch(myMissile.octave)
-        myMissile.game.resources.sounds.shots[1]:play()
+        myMissile.game.playSound(myMissile.game.resources.sounds.shots[1], myMissile.octave)
         myMissile.fireSoundStarted = true
     end
 
     myMissile.updateExplosionSound = function (dt)
         -- Son d'explosion du missile si pas encore fait
-        myMissile.game.resources.sounds.explosion:stop()
-        myMissile.game.resources.sounds.explosion:setPitch(myMissile.octave)
-        myMissile.game.resources.sounds.explosion:play()
+        myMissile.game.playSound(myMissile.game.resources.sounds.explosion, myMissile.octave)
         myMissile.ExplosionSoundStarted = true
     end
 
@@ -77,9 +73,7 @@ function createBaseMissile(myGame, myTank)
 
     myMissile.updateFireSound = function (dt)
         -- Son d'explosion du missile si pas encore fait
-        myMissile.game.resources.sounds.shot:stop()
-        myMissile.game.resources.sounds.shot:setPitch(myMissile.octave)
-        myMissile.game.resources.sounds.shot:play()
+        myMissile.game.playSound(myMissile.game.resources.sounds.shot, myMissile.octave)
         myMissile.fireSoundStarted = true
     end
 
@@ -126,11 +120,12 @@ function createBaseMissile(myGame, myTank)
     -- En cas de collision, on affiche le missile au point de contact
     myMissile.rewind = function ()
         -- On remonte dans le temps pour sortir des obstacles
-        myMissile.ttl = myMissile.ttl + 0.1
-        local easingFactor = myMissile.easing((myMissile.initialTtl - myMissile.ttl) / myMissile.initialTtl)
-        myMissile.x = myMissile.initialx + myMissile.scope * math.cos(myMissile.angle) * easingFactor
-        myMissile.y = myMissile.initialy + myMissile.scope * math.sin(myMissile.angle) * easingFactor
-        return myMissile.ttl <= myMissile.initialTtl
+        -- myMissile.ttl = myMissile.ttl + 0.1
+        -- local easingFactor = myMissile.easing((myMissile.initialTtl - myMissile.ttl) / myMissile.initialTtl)
+        -- myMissile.x = myMissile.initialx + myMissile.scope * math.cos(myMissile.angle) * easingFactor
+        -- myMissile.y = myMissile.initialy + myMissile.scope * math.sin(myMissile.angle) * easingFactor
+        -- return myMissile.ttl <= myMissile.initialTtl
+        return false
     end
 
     -- Affichage de l'explosion
