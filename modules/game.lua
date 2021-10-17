@@ -15,7 +15,8 @@ function createGame()
     -- Stockage des éléments de jeu
     myGame.sprites = {}
     myGame.tanks = {}
-    
+    myGame.mapGround = nil
+
     myGame.load = function()
         myGame.resources.load()
     end
@@ -47,6 +48,37 @@ function createGame()
         return point
     end
 
+    myGame.shaderCode = [[
+    #define NUM_LIGHTS 64
+    struct Light {
+        vec2 position;
+        vec3 diffuse;
+        float power;
+    };
+    extern Light lights[NUM_LIGHTS];
+    extern int num_lights;
+    extern vec2 screen;
+    const float constant = 1.0;
+    const float linear = 0.09;
+    const float quadratic = 0.032;
+    vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
+        vec4 pixel = Texel(image, uvs);
+        vec2 norm_screen = screen_coords / screen;
+        vec3 diffuse = vec3(0);
+        for (int i = 0; i < num_lights; i++) {
+            Light light = lights[i];
+            vec2 norm_pos = light.position / screen;
+            
+            float distance = length(norm_pos - norm_screen) * light.power;
+            float attenuation = 1.0 / (constant + linear * distance + quadratic * (distance * distance));
+            diffuse += light.diffuse * attenuation;
+        }
+        diffuse = clamp(diffuse, 0.0, 1.0);
+        return pixel + vec4(diffuse, 1.0);
+    }
+    ]]
+
+    myGame.shader = love.graphics.newShader(myGame.shaderCode)
 
     myGame.init = function (myMap)
         -- On remet à zéro les données
@@ -185,6 +217,18 @@ function createGame()
         myGame.fireShake = false
         myGame.fireShakeMaxTtl = 0.15
         myGame.fireShakeTtl = myGame.fireShakeMaxTtl
+
+        -- Construction du visuel de la map
+        myGame.mapGround = love.graphics.newCanvas()
+        love.graphics.setCanvas(myGame.mapGround)
+        for i, tile in ipairs(myGame.map.tiles) do
+            local point = myGame.GetTileOrigineFromTileInMap(i)
+            love.graphics.draw(
+                myGame.resources.images.tiles[tile], 
+                point.x + myGame.offset.x, 
+                point.y + myGame.offset.y)
+        end
+        love.graphics.setCanvas()
     end
 
     myGame.updateCamera = function (dt)
@@ -493,13 +537,33 @@ function createGame()
 
     myGame.draw = function ()
         -- On draw la map
-        for i, tile in ipairs(myGame.map.tiles) do
-            local point = myGame.GetTileOrigineFromTileInMap(i)
-            love.graphics.draw(
-                myGame.resources.images.tiles[tile], 
-                point.x + myGame.offset.x, 
-                point.y + myGame.offset.y)
+        if #myGame.missiles ~= 0 then
+            love.graphics.setShader(myGame.shader)
+            myGame.shader:send("screen", { love.graphics:getWidth(), love.graphics.getHeight() })
+            local j = 0
+            for i, myMissile in ipairs(myGame.missiles) do
+                if myMissile.isFired == true then
+                    local name = "lights[" .. j .."]"
+                    myGame.shader:send(name .. ".position", { math.floor(myMissile.initialx + myGame.offset.x), math.floor(myMissile.initialy + myGame.offset.y)})
+                    myGame.shader:send(name .. ".diffuse", {1.0, 1, 1})
+                    myGame.shader:send(name .. ".power", 512)
+                    j = j + 1
+                elseif myMissile.exploded == true then
+                    local name = "lights[" .. j .."]"
+                    myGame.shader:send(name .. ".position", { math.floor(myMissile.x + myGame.offset.x), math.floor(myMissile.y + myGame.offset.y)})
+                    myGame.shader:send(name .. ".diffuse", {1.0, 1, 1})
+                    myGame.shader:send(name .. ".power", 512)
+                    j = j + 1
+                end
+            end
+            myGame.shader:send("num_lights", j)
+            
+            love.graphics.draw(myGame.mapGround, 0, 0)
+            love.graphics.setShader()
+        else
+            love.graphics.draw(myGame.mapGround, 0, 0)
         end
+
 
         -- On draw les sprites (en dehors des arbres qui passent dans une seconde phase pour être au-dessus du reste)
         local treeList = {}

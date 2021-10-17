@@ -22,13 +22,13 @@ function createAllyTank(myGame, myTankMode, myTankSkin, x, y, angle, baseTankFac
     myTank.update = function (dt)
         myTank.initialUpdate(dt)
         -- Gestion de la poussée
-        if love.keyboard.isDown("up") then
+        if love.keyboard.isDown("up") or love.keyboard.isDown("z") then
              myTank.speed = myTank.speed + myTank.acceleration * dt
              if myTank.speed >= myTank.maxSpeed then
                  myTank.speed = myTank.maxSpeed
              end
          else
-             if love.keyboard.isDown("down") then
+             if love.keyboard.isDown("down") or love.keyboard.isDown("s") then
                  myTank.speed = myTank.speed - myTank.acceleration * dt
                  if myTank.speed <= -myTank.maxSpeed then
                      myTank.speed = -myTank.maxSpeed
@@ -44,10 +44,10 @@ function createAllyTank(myGame, myTankMode, myTankSkin, x, y, angle, baseTankFac
          end
      
          -- Modification de l'angle
-         if love.keyboard.isDown("left") then
+         if love.keyboard.isDown("left") or love.keyboard.isDown("q") then
              myTank.angle = (myTank.angle - tankConstants.ally.angleAcceleration * dt) % (2 * math.pi)
          end
-         if love.keyboard.isDown("right") then
+         if love.keyboard.isDown("right") or love.keyboard.isDown("d") then
              myTank.angle = (myTank.angle + tankConstants.ally.angleAcceleration * dt) % (2 * math.pi)
          end
      end

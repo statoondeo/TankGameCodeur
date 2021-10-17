@@ -32,7 +32,6 @@ function createBaseMissile(myGame, myTank)
     myMissile.explosionImageIndex = 0
     myMissile.explosionDamageDone = false
 
-
     myMissile.updateFireSound = function (dt)
         -- Son d'explosion du missile si pas encore fait
         myMissile.game.playSound(myMissile.game.resources.sounds.shots[1], myMissile.octave)
@@ -170,7 +169,7 @@ function createBaseMissile(myGame, myTank)
                 myMissile.angle, 
                 myMissile.fireZoom, 
                 myMissile.fireZoom, 
-                0, 
+                math.floor(myMissile.fireImage:getWidth() / 2), 
                 math.floor(myMissile.fireImage:getHeight() / 2))
         end
     end
