@@ -15,14 +15,13 @@ function createGame()
     -- Stockage des éléments de jeu
     myGame.sprites = {}
     myGame.tanks = {}
-    myGame.mapGround = nil
 
     myGame.load = function()
         myGame.resources.load()
     end
 
     myGame.GetTileCenterFromTileInMap = function(tileNumber) 
-        local point = myGame.GetTileOrigineFromTileInMap(tileNumber)
+        local point = myGame.GetTileOriginFromTileInMap(tileNumber)
 
         point.x = point.x + 0.5 * gameConstants.tiles.size.x
         point.y = point.y + 0.5 * gameConstants.tiles.size.y
@@ -30,7 +29,7 @@ function createGame()
         return point
     end
     
-    myGame.GetTileOrigineFromTileInMap = function(tileNumber) 
+    myGame.GetTileOriginFromTileInMap = function(tileNumber) 
         local point = {}
 
         point.x = ((tileNumber - 1) % myGame.map.constantes.tiles.number.x) * gameConstants.tiles.size.x
@@ -127,8 +126,25 @@ function createGame()
             end         
         end  
 
+        myGame.offset = {}
+        myGame.offset.x = 0
+        myGame.offset.y = 0   
+
+        -- Construction du visuel de la map
+        myGame.mapGround = love.graphics.newCanvas(myGame.map.constantes.tiles.number.x * gameConstants.tiles.size.x, myGame.map.constantes.tiles.number.y * gameConstants.tiles.size.y)
+        myGame.mapAerial = love.graphics.newCanvas(myGame.map.constantes.tiles.number.x * gameConstants.tiles.size.x, myGame.map.constantes.tiles.number.y * gameConstants.tiles.size.y)
+        love.graphics.setCanvas(myGame.mapGround)
+        for i, tile in ipairs(myGame.map.tiles) do
+            local point = myGame.GetTileOriginFromTileInMap(i)
+            love.graphics.draw(
+                myGame.resources.images.tiles[tile], 
+                point.x, 
+                point.y)
+            end
+        -- love.graphics.setCanvas()
+
         -- On ajoute les obstacles de la map à la collection du niveau en cours
-        myGame.map.additionalDecors = {}
+        local targetCanvas
         for i, myObstacle in ipairs(myGame.map.obstacles) do
             local myNewObstacle = createObstacle(
                 myGame,
@@ -146,7 +162,13 @@ function createGame()
                 myObstacle[12])
             table.insert(myGame.obstacles, myNewObstacle)
             if myNewObstacle.visible == true then
-                table.insert(myGame.sprites, myNewObstacle)
+                if myObstacle[1] <= 6 then
+                    targetCanvas = myGame.mapAerial
+                else
+                    targetCanvas = myGame.mapGround
+                end
+                love.graphics.setCanvas(targetCanvas)
+                myNewObstacle.draw()
             else
 
                 -- Remplissage des zones à peupler avec des décorations
@@ -155,9 +177,7 @@ function createGame()
                     local k = myObstacle[3]
                     while k < myObstacle[3] + myObstacle[12] - 16 do
                         if myObstacle[13][1] ~= nil and myObstacle[13][2] ~= nil then
-                            table.insert(
-                                myGame.sprites, 
-                                createObstacle(
+                            local newObstacle = createObstacle(
                                     myGame,
                                     love.math.random(myObstacle[13][1], myObstacle[13][2]), 
                                     j + 16, 
@@ -170,7 +190,14 @@ function createGame()
                                     nil,
                                     0,
                                     0,
-                                    0))
+                                    0)
+                            if newObstacle.imageIndex <= 6 then
+                                targetCanvas = myGame.mapAerial
+                            else
+                                targetCanvas = myGame.mapGround
+                            end
+                            love.graphics.setCanvas(targetCanvas)
+                            newObstacle.draw()                                    
                         end
                         k = k + love.math.random(16, 48)
                     end
@@ -178,6 +205,7 @@ function createGame()
                 end
             end
         end       
+        love.graphics.setCanvas()
 
         -- Création du tank joueur
         local point
@@ -203,10 +231,6 @@ function createGame()
 
         love.mouse.setCursor(myGame.resources.images.cursor)
 
-        myGame.offset = {}
-        myGame.offset.x = 0
-        myGame.offset.y = 0    
-
         myGame.initialTtl = 0
         myGame.mode = gameConstants.modes.init
         
@@ -218,17 +242,6 @@ function createGame()
         myGame.fireShakeMaxTtl = 0.15
         myGame.fireShakeTtl = myGame.fireShakeMaxTtl
 
-        -- Construction du visuel de la map
-        myGame.mapGround = love.graphics.newCanvas()
-        love.graphics.setCanvas(myGame.mapGround)
-        for i, tile in ipairs(myGame.map.tiles) do
-            local point = myGame.GetTileOrigineFromTileInMap(i)
-            love.graphics.draw(
-                myGame.resources.images.tiles[tile], 
-                point.x + myGame.offset.x, 
-                point.y + myGame.offset.y)
-        end
-        love.graphics.setCanvas()
     end
 
     myGame.updateCamera = function (dt)
@@ -558,27 +571,20 @@ function createGame()
             end
             myGame.shader:send("num_lights", j)
             
-            love.graphics.draw(myGame.mapGround, 0, 0)
+            love.graphics.draw(myGame.mapGround, myGame.offset.x, myGame.offset.y)
             love.graphics.setShader()
         else
-            love.graphics.draw(myGame.mapGround, 0, 0)
+            love.graphics.draw(myGame.mapGround, myGame.offset.x, myGame.offset.y)
         end
 
 
-        -- On draw les sprites (en dehors des arbres qui passent dans une seconde phase pour être au-dessus du reste)
-        local treeList = {}
+        -- On draw les sprites (tanks et missiles)
         for i, mySprite in ipairs(myGame.sprites) do
-            if mySprite.type == "obstacle" and mySprite.visible == true and mySprite.imageIndex <= 6 then
-                table.insert(treeList, mySprite)
-            else
-                mySprite.draw()
-            end
-        end
-
-        -- On draw les arbres
-        for i, mySprite in ipairs(treeList) do
             mySprite.draw()
         end
+
+        -- On draw le canvas avec les éléments les plus hauts
+        love.graphics.draw(myGame.mapAerial, myGame.offset.x, myGame.offset.y)
 
         myGame.map.draw()
 

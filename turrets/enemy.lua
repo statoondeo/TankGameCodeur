@@ -9,7 +9,7 @@ function createEnemyTurret(myGame, myTurretSkin, myTank)
     newTurret.stateTtl = 0
     newTurret.arc.amplitude = turretConstants.enemy.amplitude.max    
     newTurret.arc.speed = turretConstants.enemy.arcSpeed
-    newTurret.arc.radius = turretConstants.enemy.detectionRange * love.math.random(0.8, 1.2)
+    newTurret.arc.radius = turretConstants.enemy.detectionRange * love.math.random(0.8, 1.1)
 
     newTurret.initSentinel = function(dt)
         -- La tourelle fait la sentinelle

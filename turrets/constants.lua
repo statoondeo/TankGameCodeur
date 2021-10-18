@@ -14,7 +14,7 @@ this.base.flames.count = 5
 this.base.flames.speed = 15
 
 this.enemy = {}
-this.enemy.detectionRange = 175
+this.enemy.detectionRange = 160
 this.enemy.arcSpeed = 1
 this.enemy.sentinel = {}
 this.enemy.sentinel.mode = 1
