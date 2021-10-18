@@ -56,7 +56,6 @@ function createResourceLoader()
         end
 
         -- Explosion
-        resourceLoader.images.explosionBase = love.graphics.newImage("images/explosion_0.png")
         for i = 1, missileConstants.explosion.frame do
             resourceLoader.images.explosions[i] = love.graphics.newImage("images/explosion_" .. i .. ".png")
         end
