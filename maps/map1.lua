@@ -49,9 +49,9 @@ function createMap1(myGame)
         { 5, 7, 10, math.pi },
         { 5, 15, 4, math.pi / 2 }
     }
-    myMap.goals = 
+    myMap.goals1 = 
     {
-        { 15, 1, 20 }
+        { 15, 1, 20, true }
     }
 
     myMap.obstacles = 
@@ -109,13 +109,8 @@ function createMap1(myGame)
         myMap.playerLoose = false
         myMap.playerDetected = false
         myMap.missionStep = 1
-        myMap.goalHitbox = createHitbox(myMap.game, hitboxConstants.circleType)
-        local point = myMap.game.GetTileCenterFromTileInMap(myMap.goals[1][2] * myMap.constantes.tiles.number.x + myMap.goals[1][1])
-        myMap.goalHitbox.x = point.x
-        myMap.goalHitbox.y = point.y
-        myMap.goalHitbox.radius = myMap.goals[1][3]
-        myMap.goalHitbox.angle = 0
-        myMap.goals[1][4] = false
+        myMap.goalHitbox = {}
+        myMap.createGoals(myMap.goals1)
         myMap.music:setLooping(true)
         myMap.music:play()
         myMap.enemyTank = #myMap.enemies
@@ -129,8 +124,8 @@ function createMap1(myGame)
         -- On vérifie la condition de victoire (tous les tanks ennemis vaincus)
         local win = false
         if myMap.missionStep == 1 then
-            if myMap.game.playerTank.hitbox.IsCollision(myMap.goalHitbox) == true then
-                myMap.goals[1][4] = true
+            if myMap.game.playerTank.hitbox.IsCollision(myMap.goalHitbox[1]) == true then
+                myMap.goalHitbox[1].achieved = true
                 myMap.missionStep = 2
                 myMap.destroyedTank = 0
                 myMap.game.displayGameMessage({"Mission update", "Seek and destroy all enemy Tanks", "Stay alive"})
@@ -148,6 +143,20 @@ function createMap1(myGame)
             win = myMap.destroyedTank == myMap.enemyTank
         end
         return win
+    end
+
+    myMap.createGoals = function (myGoals)
+        for i, myGoal in ipairs(myGoals) do
+            local goalHitbox = createHitbox(myMap.game, hitboxConstants.circleType)
+            local point = myMap.game.GetTileCenterFromTileInMap(myGoal[2] * myMap.constantes.tiles.number.x + myGoal[1])
+            goalHitbox.x = point.x
+            goalHitbox.y = point.y
+            goalHitbox.radius = myGoal[3]
+            goalHitbox.achieved = false
+            goalHitbox.bonus = myGoal[4]
+            goalHitbox.angle = 0
+            table.insert(myMap.goalHitbox, goalHitbox)
+        end
     end
 
     myMap.CheckPlayerLoose = function ()
@@ -184,9 +193,9 @@ function createMap1(myGame)
                 myMap.game.mode = gameConstants.modes.initGameEnd
             end
         end
-        if myMap.goals[1][4] == false then
+        if myMap.goalHitbox[1].achieved == false then
             -- Affichage de l'Objectif
-            myMap.goalHitbox.angle = myMap.goalHitbox.angle + dt
+            myMap.goalHitbox[1].angle = myMap.goalHitbox[1].angle + dt
         end
     end
 
@@ -201,16 +210,24 @@ function createMap1(myGame)
         end
         love.graphics.print(label, (love.graphics.getWidth() - font:getWidth(label)) / 2, font:getHeight(label))
 
-        if myMap.goals[1][4] == false then
-            -- Affichage de l'Objectif
-            love.graphics.draw(myMap.game.resources.images.bonus, 
-                math.floor(myMap.goalHitbox.x), 
-                math.floor(myMap.goalHitbox.y), 
-                myMap.goalHitbox.angle, 
-                1, 
-                1, 
-                math.floor(myMap.game.resources.images.bonus:getWidth() / 2), 
-                math.floor(myMap.game.resources.images.bonus:getHeight() / 2))
+        for i, myGoal in ipairs(myMap.goalHitbox) do
+            if myGoal.achieved == false then
+                local asset = nil
+                if myGoal.bonus == true then
+                    asset = myMap.game.resources.images.bonus
+                else
+                    asset = myMap.game.resources.images.crosshair
+                end
+                love.graphics.draw(
+                    asset, 
+                    myGoal.x + myMap.game.offset.x, 
+                    myGoal.y + myMap.game.offset.y, 
+                    myMap.goalHitbox[1].angle, 
+                    1, 
+                    1, 
+                    asset:getWidth() / 2, 
+                    asset:getHeight() / 2)
+            end
         end
     end
 

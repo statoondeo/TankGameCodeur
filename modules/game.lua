@@ -550,32 +550,49 @@ function createGame()
 
     myGame.draw = function ()
         -- On draw la map
-        if #myGame.missiles ~= 0 then
-            love.graphics.setShader(myGame.shader)
-            myGame.shader:send("screen", { love.graphics:getWidth(), love.graphics.getHeight() })
-            local j = 0
-            for i, myMissile in ipairs(myGame.missiles) do
-                if myMissile.isFired == true then
-                    local name = "lights[" .. j .."]"
-                    myGame.shader:send(name .. ".position", { math.floor(myMissile.initialx + myGame.offset.x), math.floor(myMissile.initialy + myGame.offset.y)})
-                    myGame.shader:send(name .. ".diffuse", {1.0, 1, 1})
-                    myGame.shader:send(name .. ".power", 512)
-                    j = j + 1
-                elseif myMissile.exploded == true then
-                    local name = "lights[" .. j .."]"
-                    myGame.shader:send(name .. ".position", { math.floor(myMissile.x + myGame.offset.x), math.floor(myMissile.y + myGame.offset.y)})
-                    myGame.shader:send(name .. ".diffuse", {1.0, 1, 1})
-                    myGame.shader:send(name .. ".power", 512)
-                    j = j + 1
-                end
+        love.graphics.setShader(myGame.shader)
+        myGame.shader:send("screen", { love.graphics:getWidth(), love.graphics.getHeight() })
+        local j = 0
+        for i, myMissile in ipairs(myGame.missiles) do
+            if myMissile.isFired == true then
+                local name = "lights[" .. j .."]"
+                myGame.shader:send(name .. ".position", { math.floor(myMissile.initialx + myGame.offset.x), math.floor(myMissile.initialy + myGame.offset.y)})
+                myGame.shader:send(name .. ".diffuse", {1.0, 1.0, 1.0})
+                myGame.shader:send(name .. ".power", 512)
+                j = j + 1
+            elseif myMissile.exploded == true then
+                local name = "lights[" .. j .."]"
+                myGame.shader:send(name .. ".position", { math.floor(myMissile.x + myGame.offset.x), math.floor(myMissile.y + myGame.offset.y)})
+                myGame.shader:send(name .. ".diffuse", {1.0, 1.0, 1.0})
+                myGame.shader:send(name .. ".power", 512)
+                j = j + 1
             end
-            myGame.shader:send("num_lights", j)
-            
-            love.graphics.draw(myGame.mapGround, myGame.offset.x, myGame.offset.y)
-            love.graphics.setShader()
-        else
-            love.graphics.draw(myGame.mapGround, myGame.offset.x, myGame.offset.y)
         end
+
+        for i, myTank in ipairs(myGame.tanks) do
+            if myTank.outDated == true then
+                local name = "lights[" .. j .."]"
+                myGame.shader:send(name .. ".position", { math.floor(myTank.x + myGame.offset.x), math.floor(myTank.y + myGame.offset.y)})
+                myGame.shader:send(name .. ".diffuse", {1.0, 0.0, 0.0})
+                myGame.shader:send(name .. ".power", 128)
+                j = j + 1
+            end    
+        end
+
+        for i, myGoals in ipairs(myGame.map.goalHitbox) do
+            if myGoals.achieved == false then
+                local name = "lights[" .. j .."]"
+                myGame.shader:send(name .. ".position", { math.floor(myGoals.x + myGame.offset.x), math.floor(myGoals.y + myGame.offset.y)})
+                myGame.shader:send(name .. ".diffuse", {1.0, 0.5, 0.0})
+                myGame.shader:send(name .. ".power", 256)
+                j = j + 1
+            end    
+        end
+
+        myGame.shader:send("num_lights", j)
+        
+        love.graphics.draw(myGame.mapGround, myGame.offset.x, myGame.offset.y)
+        love.graphics.setShader()
 
 
         -- On draw les sprites (tanks et missiles)

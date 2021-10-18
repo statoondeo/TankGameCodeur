@@ -12,6 +12,7 @@ function createMainMenu(myGame)
     myMap.constantes = myMap.map.constantes
     myMap.tiles = myMap.map.tiles
     myMap.obstacles = myMap.map.obstacles
+    myMap.goalHitbox = {}
 
     -- Point de départ du joueur
     myMap.start = nil
